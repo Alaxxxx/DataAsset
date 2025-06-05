@@ -7,6 +7,9 @@ namespace ScriptableAsset.Editor
 {
       public sealed partial class ScriptableEditor
       {
+            /// <summary>
+            /// Specifies the modes available for sorting data objects within a <see cref="ScriptableEditor"/>.
+            /// </summary>
             private enum SortMode
             {
                   None,
@@ -15,6 +18,11 @@ namespace ScriptableAsset.Editor
                   ByType
             }
 
+            /// <summary>
+            /// Sorts the data objects in the editor based on the specified sort mode.
+            /// </summary>
+            /// <param name="mode">The sorting mode to apply to the data objects.</param>
+            /// <exception cref="ArgumentOutOfRangeException">Thrown when the specified sorting mode is not defined in <see cref="SortMode"/>.</exception>
             private void ApplySort(SortMode mode)
             {
                   if (_allDataProperty is not { arraySize: > 1 })

@@ -9,6 +9,18 @@ namespace ScriptableAsset.Editor
       {
             private readonly Dictionary<int, bool> _isNameDuplicate = new();
 
+            /// <summary>
+            /// Validates the uniqueness of all object names in the serialized data property.
+            /// Any duplicate names within the data will be marked in the `_isNameDuplicate` dictionary.
+            /// </summary>
+            /// <remarks>
+            /// - This method iterates through a serialized array property (`_allDataProperty`) to extract and validate names.
+            /// - If a name is found to be non-unique across the collection, its index is flagged as duplicate in the `_isNameDuplicate` dictionary.
+            /// - Empty or null names are ignored during the validation process.
+            /// - The method will return early if `_allDataProperty` is null.
+            /// </remarks>
+            /// <seealso cref="ScriptableEditor.ApplySort"/>
+            /// <seealso cref="ScriptableEditor.OnInspectorGUI"/>
             private void ValidateAllNames()
             {
                   _isNameDuplicate.Clear();

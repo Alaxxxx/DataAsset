@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ScriptableAsset.Core;
+using ScriptableAsset.Core.Struct;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine.SceneManagement;
@@ -14,6 +15,19 @@ namespace ScriptableAsset.Editor
 {
       public sealed partial class ScriptableEditor
       {
+            /// <summary>
+            /// Initiates a scan for data usage references within the project.
+            /// This method uses coroutines to asynchronously analyze relevant assets and scripts across the project,
+            /// searching for potential references to the target data object.
+            /// </summary>
+            /// <remarks>
+            /// If a scan is already in progress, this method prevents initiating a new one to avoid conflicts or redundant operations.
+            /// The scanning process includes evaluating prefabs, ScriptableObjects, and open scenes in the project.
+            /// The progress of the scan is indicated using an EditorUtility progress bar, and detailed usage data is collected for further inspection.
+            /// </remarks>
+            /// <exception cref="System.InvalidOperationException">
+            /// Thrown if prerequisites for the scanning process (such as target asset or data properties) are not met.
+            /// </exception>
             private void StartScanForDataUsages()
             {
                   if (_isScanningUsages)
@@ -31,6 +45,23 @@ namespace ScriptableAsset.Editor
                   _scanCoroutine = EditorCoroutineUtility.StartCoroutine(ScanForDataUsagesCoroutine(), this);
             }
 
+            /// <summary>
+            /// Executes the coroutine responsible for scanning data usage references within the asset.
+            /// This process analyzes prefabs, ScriptableObjects, and open scenes to identify potential references
+            /// to specific data objects within the target asset.
+            /// </summary>
+            /// <remarks>
+            /// The method initializes the scan by validating prerequisites such as the presence of a target asset
+            /// and relevant data properties. It iterates through various asset types including prefabs and ScriptableObjects,
+            /// using progress indicators to show the scanning status.
+            /// At completion, it aggregates and logs detailed usage information for further analysis.
+            /// </remarks>
+            /// <returns>
+            /// An IEnumerator that allows the coroutine to execute asynchronously without blocking the main thread.
+            /// </returns>
+            /// <exception cref="System.InvalidOperationException">
+            /// Thrown if the required conditions, such as valid target asset or data properties, are not met before the scan begins.
+            /// </exception>
             private IEnumerator ScanForDataUsagesCoroutine()
             {
                   if (!_targetAsset || _allDataProperty == null)

@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ScriptableAsset.Core;
 using UnityEngine;
 
-namespace ScriptableAsset
+namespace ScriptableAsset.Core
 {
       [CreateAssetMenu(fileName = "ScriptableAsset", menuName = "ScriptableObjects/ScriptableAsset", order = 1)]
       public sealed class ScriptableAsset : ScriptableObject

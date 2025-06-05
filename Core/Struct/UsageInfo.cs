@@ -1,5 +1,12 @@
-﻿namespace ScriptableAsset.Core
+﻿namespace ScriptableAsset.Core.Struct
 {
+      /// <summary>
+      /// Represents detailed information about a script's usage within a specific context.
+      /// </summary>
+      /// <remarks>
+      /// This struct provides metadata about the location, container, and context in which a script is used.
+      /// It is primarily used to track references and identify usage patterns within Unity-based projects.
+      /// </remarks>
       public readonly struct UsageInfo
       {
             public readonly string ScriptName;
