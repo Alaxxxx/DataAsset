@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using ScriptableAsset.Core;
+using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -32,7 +34,7 @@ namespace ScriptableAsset.Editor
             // Search text for filtering data objects
             private string _searchText = "";
 
-            // Pending data for adding new objects
+            // Pending data for adding new already defined data objects
             private Type _pendingType;
             private string _pendingName = "";
             private int _pendingIntValue;
@@ -43,6 +45,12 @@ namespace ScriptableAsset.Editor
             private float _pendingFloatValue;
             private long _pendingLongValue;
 
+            // Scanning usage
+            private readonly Dictionary<string, List<UsageInfo>> _detailedDataUsages = new();
+            private readonly Dictionary<int, bool> _foldoutUsageStates = new();
+            private bool _isScanningUsages;
+            private EditorCoroutine _scanCoroutine;
+
             // Flag to check if styles have been initialized
             private bool _stylesInitialized;
 
@@ -51,7 +59,7 @@ namespace ScriptableAsset.Editor
                   // Initialize the target asset and serialized properties
                   _targetAsset = (ScriptableAsset)target;
 
-                  if (_targetAsset == null)
+                  if (!_targetAsset)
                   {
                         Debug.LogError("[ScriptableEditor] Target asset is null. Ensure the scriptable object is assigned correctly.");
 

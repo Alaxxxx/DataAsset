@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using ScriptableAsset.Core;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace ScriptableAsset.Editor
 {
@@ -12,6 +14,8 @@ namespace ScriptableAsset.Editor
             {
                   if (_allDataProperty == null)
                   {
+                        Debug.LogError("[ScriptableEditor.SetupReorderableList] _allDataProperty is null. Cannot setup list.");
+
                         return;
                   }
 
@@ -24,155 +28,260 @@ namespace ScriptableAsset.Editor
                   {
                               drawHeaderCallback = rect =>
                               {
+                                    float totalWidth = rect.width;
                                     float currentX = rect.x;
-                                    float searchWidth = Mathf.Max(rect.width * 0.4f, 150f);
-                                    float buttonWidth = Mathf.Max(rect.width * 0.15f, 80f);
-                                    float remainingWidth = rect.width - searchWidth - (buttonWidth * 3) - 15;
+                                    const float spacing = 5f;
 
-                                    EditorGUI.LabelField(new Rect(currentX, rect.y, Mathf.Max(0, remainingWidth), EditorGUIUtility.singleLineHeight), "Data Objects");
-                                    currentX += Mathf.Max(0, remainingWidth) + 5;
+                                    var titleContent = new GUIContent("Data Objects");
+                                    float titleWidth = EditorStyles.label.CalcSize(titleContent).x;
+                                    EditorGUI.LabelField(new Rect(currentX, rect.y, titleWidth, EditorGUIUtility.singleLineHeight), titleContent);
+                                    currentX += titleWidth + spacing * 2;
+
+                                    float searchWidth = Mathf.Max(totalWidth * 0.25f, 100f);
 
                                     _searchText = EditorGUI.TextField(new Rect(currentX, rect.y, searchWidth, EditorGUIUtility.singleLineHeight),
                                                 _searchText,
                                                 EditorStyles.toolbarSearchField);
-                                    currentX += searchWidth + 5;
+                                    currentX += searchWidth + spacing * 2;
 
-                                    if (GUI.Button(new Rect(currentX, rect.y, buttonWidth, EditorGUIUtility.singleLineHeight), "Name ▼", EditorStyles.toolbarButton))
+                                    const float sortButtonWidth = 70f;
+                                    const float scanButtonWidth = 90f;
+                                    const float buttonsAreaWidth = (sortButtonWidth * 3) + (spacing * 2) + scanButtonWidth;
+                                    float flexibleSpace = totalWidth - currentX - buttonsAreaWidth;
+
+                                    if (flexibleSpace > 0)
+                                    {
+                                          currentX += flexibleSpace;
+                                    }
+
+                                    if (GUI.Button(new Rect(currentX, rect.y, sortButtonWidth, EditorGUIUtility.singleLineHeight), "Name ▼", EditorStyles.toolbarButton))
                                     {
                                           ApplySort(SortMode.ByNameAsc);
                                     }
 
-                                    currentX += buttonWidth;
+                                    currentX += sortButtonWidth;
 
-                                    if (GUI.Button(new Rect(currentX, rect.y, buttonWidth, EditorGUIUtility.singleLineHeight), "Name ▲", EditorStyles.toolbarButton))
+                                    if (GUI.Button(new Rect(currentX, rect.y, sortButtonWidth, EditorGUIUtility.singleLineHeight), "Name ▲", EditorStyles.toolbarButton))
                                     {
                                           ApplySort(SortMode.ByNameDesc);
                                     }
 
-                                    currentX += buttonWidth;
+                                    currentX += sortButtonWidth;
 
-                                    if (GUI.Button(new Rect(currentX, rect.y, buttonWidth, EditorGUIUtility.singleLineHeight), "Type", EditorStyles.toolbarButton))
+                                    if (GUI.Button(new Rect(currentX, rect.y, sortButtonWidth, EditorGUIUtility.singleLineHeight), "Type", EditorStyles.toolbarButton))
                                     {
                                           ApplySort(SortMode.ByType);
                                     }
+
+                                    currentX += sortButtonWidth + spacing;
+
+                                    GUIContent scanButtonContent = _isScanningUsages
+                                                ? new GUIContent("Scanning...", "Scanning project for data usages")
+                                                : new GUIContent("Scan Usages", "Scan scripts potentially referencing this asset's data names");
+                                    EditorGUI.BeginDisabledGroup(_isScanningUsages);
+
+                                    if (GUI.Button(new Rect(currentX, rect.y, scanButtonWidth, EditorGUIUtility.singleLineHeight), scanButtonContent, EditorStyles.toolbarButton))
+                                    {
+                                          StartScanForDataUsages();
+                                    }
+
+                                    EditorGUI.EndDisabledGroup();
                               }
                   };
 
-                  _reorderableList.drawElementCallback = (rect, index, _, _) =>
-                  {
-                        if (!_stylesInitialized)
-                        {
-                              InitializeEditorStyles();
-                        }
-
-                        SerializedProperty element = _reorderableList.serializedProperty.GetArrayElementAtIndex(index);
-
-                        if (element.managedReferenceValue is not DataObject dataObject)
-                        {
-                              EditorGUI.LabelField(rect, "Invalid data element.");
-
-                              return;
-                        }
-
-                        bool isDimmed = !string.IsNullOrEmpty(_searchText) &&
-                                        !dataObject.name.ToLowerInvariant().Contains(_searchText.ToLowerInvariant(), StringComparison.Ordinal);
-
-                        var blockRect = new Rect(rect.x + DragHandleWidth, rect.y + 1, rect.width - DragHandleWidth - 1, rect.height - 2);
-                        GUI.Box(blockRect, GUIContent.none, _blockStyle);
-
-                        var contentRect = new Rect(blockRect.x + _blockStyle.padding.left,
-                                    blockRect.y + _blockStyle.padding.top,
-                                    blockRect.width - _blockStyle.padding.horizontal,
-                                    blockRect.height - _blockStyle.padding.vertical);
-
-                        if (isDimmed)
-                        {
-                              EditorGUI.BeginDisabledGroup(true);
-                        }
-
-                        var colorBarRect = new Rect(contentRect.x, contentRect.y, ColorBarWidth, contentRect.height);
-
-                        if (_typeColors.TryGetValue(dataObject.GetType(), out Color typeColor))
-                        {
-                              EditorGUI.DrawRect(colorBarRect, typeColor);
-                        }
-
-                        var fieldsRect = new Rect(contentRect.x + ColorBarWidth + 4, contentRect.y, contentRect.width - ColorBarWidth - 4, contentRect.height);
-
-                        var nameLineRect = new Rect(fieldsRect.x, fieldsRect.y, fieldsRect.width, EditorGUIUtility.singleLineHeight);
-                        float nameFieldWidth = nameLineRect.width * 0.65f;
-                        float typeFieldWidth = nameLineRect.width - nameFieldWidth - 5;
-
-                        SerializedProperty nameProperty = element.FindPropertyRelative("name");
-
-                        if (nameProperty != null)
-                        {
-                              EditorGUI.BeginChangeCheck();
-                              EditorGUI.PropertyField(new Rect(nameLineRect.x, nameLineRect.y, nameFieldWidth, nameLineRect.height), nameProperty, GUIContent.none);
-
-                              if (EditorGUI.EndChangeCheck())
+                  _reorderableList.drawElementCallback =
+                              (rect, index, _, _) =>
                               {
-                                    ValidateAllNames();
-                              }
-                        }
-                        else
-                        {
-                              EditorGUI.LabelField(new Rect(nameLineRect.x, nameLineRect.y, nameFieldWidth, nameLineRect.height), dataObject.name);
-                        }
+                                    if (!_stylesInitialized)
+                                    {
+                                          InitializeEditorStyles();
+                                    }
 
-                        EditorGUI.LabelField(new Rect(nameLineRect.x + nameFieldWidth + 5, nameLineRect.y, typeFieldWidth, nameLineRect.height),
-                                    dataObject.GetType().Name,
-                                    _elementTypeLabelStyle);
+                                    SerializedProperty element = _reorderableList.serializedProperty.GetArrayElementAtIndex(index);
+                                    var dataObject = element.managedReferenceValue as DataObject;
 
-                        float currentY = nameLineRect.yMax + EditorGUIUtility.standardVerticalSpacing;
+                                    if (dataObject == null)
+                                    {
+                                          EditorGUI.LabelField(rect, "Invalid data element (null reference).");
 
-                        if (_isNameDuplicate.TryGetValue(index, out bool isDuplicate) && isDuplicate)
-                        {
-                              var errorRect = new Rect(fieldsRect.x, currentY, fieldsRect.width, EditorGUIUtility.singleLineHeight);
-                              EditorGUI.LabelField(errorRect, "This name is already in use.", _errorLabelStyle);
-                              currentY += errorRect.height;
-                        }
+                                          return;
+                                    }
 
+                                    bool isDimmed = !string.IsNullOrEmpty(_searchText) &&
+                                                    !dataObject.name.ToLowerInvariant().Contains(_searchText.ToLowerInvariant(), StringComparison.Ordinal);
 
-                        SerializedProperty currentProp = element.Copy();
-                        bool enterChildren = true;
+                                    var elementBackgroundRect = new Rect(rect.x + DragHandleWidth, rect.y + 1, rect.width - DragHandleWidth - 1, rect.height - 2);
+                                    GUI.Box(elementBackgroundRect, GUIContent.none, _blockStyle);
 
-                        while (currentProp.NextVisible(enterChildren))
-                        {
-                              enterChildren = false;
+                                    var contentRect = new Rect(elementBackgroundRect.x + _blockStyle.padding.left,
+                                                elementBackgroundRect.y + _blockStyle.padding.top,
+                                                elementBackgroundRect.width - _blockStyle.padding.horizontal,
+                                                elementBackgroundRect.height - _blockStyle.padding.vertical);
 
-                              if (SerializedProperty.EqualContents(currentProp, element.GetEndProperty()))
-                              {
-                                    break;
-                              }
+                                    if (isDimmed)
+                                    {
+                                          EditorGUI.BeginDisabledGroup(true);
+                                    }
 
-                              if (currentProp.name == "name")
-                              {
-                                    continue;
-                              }
+                                    var colorBarRect = new Rect(contentRect.x, contentRect.y, ColorBarWidth, contentRect.height);
 
-                              var propRect = new Rect(fieldsRect.x, currentY, fieldsRect.width, EditorGUI.GetPropertyHeight(currentProp, true));
+                                    if (_typeColors.TryGetValue(dataObject.GetType(), out Color typeColor))
+                                    {
+                                          EditorGUI.DrawRect(colorBarRect, typeColor);
+                                    }
 
-                              if (currentProp.propertyPath.EndsWith(".value", StringComparison.Ordinal))
-                              {
-                                    float originalLabelWidth = EditorGUIUtility.labelWidth;
-                                    EditorGUIUtility.labelWidth = 50f;
-                                    EditorGUI.PropertyField(propRect, currentProp, true);
-                                    EditorGUIUtility.labelWidth = originalLabelWidth;
-                              }
-                              else
-                              {
-                                    EditorGUI.PropertyField(propRect, currentProp, true);
-                              }
+                                    var fieldsRect = new Rect(contentRect.x + ColorBarWidth + 4,
+                                                contentRect.y,
+                                                contentRect.width - ColorBarWidth - 4,
+                                                contentRect.height);
+                                    var nameLineRect = new Rect(fieldsRect.x, fieldsRect.y, fieldsRect.width, EditorGUIUtility.singleLineHeight);
 
-                              currentY += propRect.height + EditorGUIUtility.standardVerticalSpacing;
-                        }
+                                    string usageFoldoutLabel = "";
+                                    float usageFoldoutWidth = 0f;
+                                    List<UsageInfo> usages = null;
+                                    bool hasUsages = _detailedDataUsages != null && _detailedDataUsages.TryGetValue(dataObject.name, out usages) && usages.Count > 0;
 
-                        if (isDimmed)
-                        {
-                              EditorGUI.EndDisabledGroup();
-                        }
-                  };
+                                    if (hasUsages)
+                                    {
+                                          usageFoldoutLabel = $" ({usages.Count} refs)";
+                                          usageFoldoutWidth = EditorStyles.foldout.CalcSize(new GUIContent(usageFoldoutLabel)).x + 5f;
+                                    }
+
+                                    float typeNameDisplayWidth = EditorStyles.miniLabel.CalcSize(new GUIContent(dataObject.GetType().Name)).x +
+                                                                 _elementTypeLabelStyle.padding.horizontal + 5f;
+                                    float nameLabelWidth = 40f;
+                                    float nameFieldAvailableWidth = nameLineRect.width - nameLabelWidth - usageFoldoutWidth - typeNameDisplayWidth - 5f;
+                                    float nameFieldActualWidth = Mathf.Max(nameFieldAvailableWidth, 50f);
+
+                                    EditorGUI.LabelField(new Rect(nameLineRect.x, nameLineRect.y, nameLabelWidth, nameLineRect.height), "Name:");
+                                    SerializedProperty nameProperty = element.FindPropertyRelative("name");
+
+                                    if (nameProperty != null)
+                                    {
+                                          EditorGUI.BeginChangeCheck();
+
+                                          EditorGUI.PropertyField(new Rect(nameLineRect.x + nameLabelWidth, nameLineRect.y, nameFieldActualWidth, nameLineRect.height),
+                                                      nameProperty,
+                                                      GUIContent.none);
+
+                                          if (EditorGUI.EndChangeCheck())
+                                          {
+                                                ValidateAllNames();
+                                          }
+                                    }
+                                    else
+                                    {
+                                          EditorGUI.LabelField(new Rect(nameLineRect.x + nameLabelWidth, nameLineRect.y, nameFieldActualWidth, nameLineRect.height),
+                                                      dataObject.name);
+                                    }
+
+                                    float currentXOnNameLine = nameLineRect.x + nameLabelWidth + nameFieldActualWidth;
+
+                                    if (hasUsages)
+                                    {
+                                          _foldoutUsageStates.TryAdd(index, false);
+
+                                          _foldoutUsageStates[index] =
+                                                      EditorGUI.Foldout(new Rect(currentXOnNameLine, nameLineRect.y, usageFoldoutWidth, nameLineRect.height),
+                                                                  _foldoutUsageStates[index],
+                                                                  usageFoldoutLabel,
+                                                                  true,
+                                                                  EditorStyles.foldout);
+                                          currentXOnNameLine += usageFoldoutWidth;
+                                    }
+
+                                    EditorGUI.LabelField(new Rect(currentXOnNameLine + 5f, nameLineRect.y, typeNameDisplayWidth, nameLineRect.height),
+                                                dataObject.GetType().Name,
+                                                _elementTypeLabelStyle);
+
+                                    float currentY = nameLineRect.yMax + EditorGUIUtility.standardVerticalSpacing;
+
+                                    if (hasUsages && _foldoutUsageStates.TryGetValue(index, out bool isUsageFoldoutExpanded) && isUsageFoldoutExpanded)
+                                    {
+                                          EditorGUI.indentLevel++;
+
+                                          foreach (UsageInfo usage in usages)
+                                          {
+                                                var usageDetailRect = new Rect(fieldsRect.x, currentY, fieldsRect.width, EditorGUIUtility.singleLineHeight);
+                                                string goNamePart = string.IsNullOrEmpty(usage.GameObjectName) ? "" : $"on GO '{usage.GameObjectName}' ";
+                                                string displayText = $"↳ in '{usage.ScriptName}' {goNamePart}({usage.ContainerType}: {usage.ContainerName})";
+                                                var usageContent = new GUIContent(displayText, $"{usage.ScriptPath}\n(Container: {usage.ContainerPath})");
+
+                                                if (GUI.Button(usageDetailRect, usageContent, EditorStyles.label))
+                                                {
+                                                      var scriptObj = AssetDatabase.LoadAssetAtPath<Object>(usage.ScriptPath);
+
+                                                      if (scriptObj)
+                                                      {
+                                                            EditorGUIUtility.PingObject(scriptObj);
+                                                      }
+                                                }
+
+                                                currentY += usageDetailRect.height + EditorGUIUtility.standardVerticalSpacing / 2;
+                                          }
+
+                                          EditorGUI.indentLevel--;
+                                          currentY += EditorGUIUtility.standardVerticalSpacing / 2;
+                                    }
+
+                                    if (_isNameDuplicate.TryGetValue(index, out bool isDuplicate) && isDuplicate)
+                                    {
+                                          var errorRect = new Rect(fieldsRect.x, currentY, fieldsRect.width, EditorGUIUtility.singleLineHeight);
+                                          EditorGUI.LabelField(errorRect, "This name is already in use.", _errorLabelStyle);
+                                          currentY += errorRect.height + EditorGUIUtility.standardVerticalSpacing;
+                                    }
+
+                                    currentY += 2f;
+
+                                    SerializedProperty currentProp = element.Copy();
+                                    bool enterChildren = true;
+
+                                    while (currentProp.NextVisible(enterChildren))
+                                    {
+                                          enterChildren = false;
+
+                                          if (SerializedProperty.EqualContents(currentProp, element.GetEndProperty()))
+                                          {
+                                                break;
+                                          }
+
+                                          if (currentProp.name == "name")
+                                          {
+                                                continue;
+                                          }
+
+                                          var propRect = new Rect(fieldsRect.x, currentY, fieldsRect.width, EditorGUI.GetPropertyHeight(currentProp, true));
+
+                                          if (currentProp.propertyPath.EndsWith(".value", StringComparison.OrdinalIgnoreCase))
+                                          {
+                                                float originalLabelWidth = EditorGUIUtility.labelWidth;
+                                                EditorGUIUtility.labelWidth = 40f;
+
+                                                EditorGUI.LabelField(new Rect(propRect.x, propRect.y, EditorGUIUtility.labelWidth, EditorGUIUtility.singleLineHeight),
+                                                            new GUIContent(currentProp.displayName));
+
+                                                EditorGUI.PropertyField(new Rect(propRect.x + EditorGUIUtility.labelWidth,
+                                                                        propRect.y,
+                                                                        propRect.width - EditorGUIUtility.labelWidth,
+                                                                        propRect.height),
+                                                            currentProp,
+                                                            GUIContent.none,
+                                                            true);
+                                                EditorGUIUtility.labelWidth = originalLabelWidth;
+                                          }
+                                          else
+                                          {
+                                                EditorGUI.PropertyField(propRect, currentProp, true);
+                                          }
+
+                                          currentY += propRect.height + EditorGUIUtility.standardVerticalSpacing;
+                                    }
+
+                                    if (isDimmed)
+                                    {
+                                          EditorGUI.EndDisabledGroup();
+                                    }
+                              };
 
                   _reorderableList.elementHeightCallback = index =>
                   {
@@ -185,11 +294,25 @@ namespace ScriptableAsset.Editor
                         float height = EditorGUIUtility.singleLineHeight;
                         height += _blockStyle.padding.vertical;
                         height += 4;
+                        height += EditorGUIUtility.standardVerticalSpacing * 2;
 
                         if (_isNameDuplicate.TryGetValue(index, out bool isDuplicate) && isDuplicate)
                         {
-                              height += EditorGUIUtility.singleLineHeight;
+                              height += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
                         }
+
+                        List<UsageInfo> usages = null;
+
+                        bool hasUsages = _detailedDataUsages != null &&
+                                         _detailedDataUsages.TryGetValue((element.managedReferenceValue as DataObject)?.name ?? "", out usages) && usages.Count > 0;
+
+                        if (hasUsages && _foldoutUsageStates.TryGetValue(index, out bool isUsageFoldoutExpanded) && isUsageFoldoutExpanded)
+                        {
+                              height += (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing / 2) * usages.Count;
+                              height += EditorGUIUtility.standardVerticalSpacing / 2;
+                        }
+
+                        height += 2f;
 
                         SerializedProperty currentProp = element.Copy();
                         bool enterChildren = true;
