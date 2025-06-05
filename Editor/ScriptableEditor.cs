@@ -73,6 +73,8 @@ namespace ScriptableAsset.Editor
             // Flag to check if styles have been initialized
             private bool _stylesInitialized;
 
+            private const string UsageCacheFolderName = "ScriptableAssetUsageCache";
+
             /// <summary>
             /// Unity calls this method automatically when the custom editor is enabled in the Inspector.
             /// It initializes important serialized properties, validates asset data, and sets up custom
@@ -113,6 +115,7 @@ namespace ScriptableAsset.Editor
                   InitializeDataTypeReflectionAndColors();
                   SetupReorderableList();
                   ResetPendingData();
+                  LoadUsageCache();
             }
 
             /// <summary>

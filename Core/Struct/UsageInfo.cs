@@ -1,37 +1,37 @@
-﻿namespace ScriptableAsset.Core.Struct
+﻿using System;
+
+namespace ScriptableAsset.Core.Struct
 {
-      /// <summary>
-      /// Represents detailed information about a script's usage within a specific context.
-      /// </summary>
-      /// <remarks>
-      /// This struct provides metadata about the location, container, and context in which a script is used.
-      /// It is primarily used to track references and identify usage patterns within Unity-based projects.
-      /// </remarks>
-      public readonly struct UsageInfo
+      [Serializable]
+      public struct UsageInfo
       {
-            public readonly string ScriptName;
-            public readonly string ScriptPath;
+            public string scriptName;
+            public string scriptPath;
+            public string containerType;
+            public string containerName;
+            public string containerPath;
+            public string gameObjectName;
+            public int lineNumber;
 
-            public readonly string ContainerType;
-            public readonly string ContainerName;
-            public readonly string ContainerPath;
-            public readonly string GameObjectName;
-
-            public UsageInfo(string scriptName, string scriptPath, string containerType, string containerName, string containerPath, string gameObjectName = null)
+            public UsageInfo(string scriptName, string scriptPath, string containerType, string containerName, string containerPath, string gameObjectName = null,
+                        int lineNumber = 0)
             {
-                  ScriptName = scriptName;
-                  ScriptPath = scriptPath;
-                  ContainerType = containerType;
-                  ContainerName = containerName;
-                  ContainerPath = containerPath;
-                  GameObjectName = gameObjectName;
+                  this.scriptName = scriptName;
+                  this.scriptPath = scriptPath;
+                  this.containerType = containerType;
+                  this.containerName = containerName;
+                  this.containerPath = containerPath;
+                  this.gameObjectName = gameObjectName;
+                  this.lineNumber = lineNumber;
             }
 
             public override string ToString()
             {
-                  return !string.IsNullOrEmpty(GameObjectName)
-                              ? $"Script: {ScriptName} on GameObject: {GameObjectName} (in {ContainerType}: {ContainerName})"
-                              : $"Script: {ScriptName} (in {ContainerType}: {ContainerName})";
+                  string lineInfo = lineNumber > 0 ? $" L:{lineNumber}" : "";
+
+                  return !string.IsNullOrEmpty(gameObjectName)
+                              ? $"Script: {scriptName}{lineInfo} on GO: {gameObjectName} (in {containerType}: {containerName})"
+                              : $"Script: {scriptName}{lineInfo} (in {containerType}: {containerName})";
             }
       }
 }

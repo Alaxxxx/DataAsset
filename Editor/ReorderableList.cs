@@ -344,16 +344,18 @@ namespace ScriptableAsset.Editor
                   foreach (UsageInfo usage in usages)
                   {
                         var detailRect = new Rect(areaRect.x, currentY, availableWidth, EditorGUIUtility.singleLineHeight);
-                        string goNamePart = string.IsNullOrEmpty(usage.GameObjectName) ? "" : $"on GO '{usage.GameObjectName}' ";
-                        string displayText = $"↳ in '{usage.ScriptName}' {goNamePart}({usage.ContainerType}: {usage.ContainerName})";
-                        var usageContent = new GUIContent(displayText, $"{usage.ScriptPath}\n(Container: {usage.ContainerPath})");
+                        string goNamePart = string.IsNullOrEmpty(usage.gameObjectName) ? "" : $"on GO '{usage.gameObjectName}' ";
+                        string lineInfo = usage.lineNumber > 0 ? $" (L:{usage.lineNumber})" : "";
+                        string displayText = $"↳ in '{usage.scriptName}'{lineInfo} {goNamePart}({usage.containerType}: {usage.containerName})";
+                        var usageContent = new GUIContent(displayText, $"{usage.scriptPath}\n(Container: {usage.containerPath})");
 
                         if (GUI.Button(detailRect, usageContent, EditorStyles.label))
                         {
-                              var scriptObj = AssetDatabase.LoadAssetAtPath<Object>(usage.ScriptPath);
+                              var scriptObj = AssetDatabase.LoadAssetAtPath<Object>(usage.scriptPath);
 
                               if (scriptObj)
                               {
+                                    AssetDatabase.OpenAsset(scriptObj, usage.lineNumber > 0 ? usage.lineNumber : -1);
                                     EditorGUIUtility.PingObject(scriptObj);
                               }
                         }

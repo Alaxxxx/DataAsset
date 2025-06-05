@@ -123,13 +123,13 @@ namespace ScriptableAsset.Editor
 
                               foreach (UsageInfo usage in usages)
                               {
-                                    string goNamePart = string.IsNullOrEmpty(usage.GameObjectName) ? "" : $"on GameObject '{usage.GameObjectName}' ";
-                                    string displayText = $"↳ in '{usage.ScriptName}' {goNamePart}({usage.ContainerType}: {usage.ContainerName})";
-                                    var usageContent = new GUIContent(displayText, $"{usage.ScriptPath}\n(Container: {usage.ContainerPath})");
+                                    string goNamePart = string.IsNullOrEmpty(usage.gameObjectName) ? "" : $"on GameObject '{usage.gameObjectName}' ";
+                                    string displayText = $"↳ in '{usage.scriptName}' {goNamePart}({usage.containerType}: {usage.containerName})";
+                                    var usageContent = new GUIContent(displayText, $"{usage.scriptPath}\n(Container: {usage.containerPath})");
 
                                     if (GUILayout.Button(usageContent, EditorStyles.label))
                                     {
-                                          var scriptObj = AssetDatabase.LoadAssetAtPath<Object>(usage.ScriptPath);
+                                          var scriptObj = AssetDatabase.LoadAssetAtPath<Object>(usage.scriptPath);
 
                                           if (scriptObj)
                                           {

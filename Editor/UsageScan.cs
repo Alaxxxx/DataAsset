@@ -52,7 +52,8 @@ namespace ScriptableAsset.Editor
             /// </summary>
             /// <remarks>
             /// The method initializes the scan by validating prerequisites such as the presence of a target asset
-            /// and relevant data properties. It iterates through various asset types including prefabs and ScriptableObjects,
+            /// and relevant data properties.
+            /// It iterates through various asset types, including prefabs and ScriptableObjects,
             /// using progress indicators to show the scanning status.
             /// At completion, it aggregates and logs detailed usage information for further analysis.
             /// </remarks>
@@ -295,27 +296,44 @@ namespace ScriptableAsset.Editor
 
                                     string escapedName = Regex.Escape(dataItem.name);
 
-                                    var usagePrototype = new UsageInfo(scriptName,
-                                                scriptPath,
-                                                context.ReferencingContainerType,
-                                                context.ReferencingContainerName,
-                                                context.ReferencingContainerPath,
-                                                context.SpecificGameObjectName);
+                                    Action<Match> addUsageWithLineNumber = match =>
+                                    {
+                                          int charIndex = match.Index;
+
+                                          int lineNumber = 1;
+
+                                          for (int charPos = 0; charPos < charIndex; charPos++)
+                                          {
+                                                if (scriptContent[charPos] == '\n')
+                                                {
+                                                      lineNumber++;
+                                                }
+                                          }
+
+                                          _detailedDataUsages[dataItem.name]
+                                                      .Add(new UsageInfo(scriptName,
+                                                                  scriptPath,
+                                                                  context.ReferencingContainerType,
+                                                                  context.ReferencingContainerName,
+                                                                  context.ReferencingContainerPath,
+                                                                  context.SpecificGameObjectName,
+                                                                  lineNumber));
+                                    };
 
                                     string patternNonGeneric = $@"\.GetData\s*\(\s*\""{escapedName}\""\s*\)";
                                     MatchCollection matchesNonGeneric = Regex.Matches(scriptContent, patternNonGeneric);
 
-                                    foreach (Match unused in matchesNonGeneric)
+                                    foreach (Match match in matchesNonGeneric)
                                     {
-                                          _detailedDataUsages[dataItem.name].Add(usagePrototype);
+                                          addUsageWithLineNumber(match);
                                     }
 
                                     string patternGeneric = $@"\.GetData\s*<[^>]+>\s*\(\s*\""{escapedName}\""\s*\)";
                                     MatchCollection matchesGeneric = Regex.Matches(scriptContent, patternGeneric);
 
-                                    foreach (Match unused in matchesGeneric)
+                                    foreach (Match match in matchesGeneric)
                                     {
-                                          _detailedDataUsages[dataItem.name].Add(usagePrototype);
+                                          addUsageWithLineNumber(match);
                                     }
                               }
                         }
@@ -331,11 +349,10 @@ namespace ScriptableAsset.Editor
                   _isScanningUsages = false;
                   long totalUsagesFound = _detailedDataUsages.Sum(static list => list.Value.Count);
 
-                  Debug.Log(
-                              $"[ScriptableEditor] Script scan complete. Found {totalUsagesFound} potential data usages across {scriptsToAnalyzeWithContext.Count} script contexts.");
+                  Debug.Log($"[ScriptableEditor] Script scan complete. Found {totalUsagesFound} data usages across {scriptsToAnalyzeWithContext.Count} script contexts.");
+
+                  SaveUsageCache();
                   Repaint();
             }
       }
-
-
 }
