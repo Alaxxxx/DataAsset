@@ -1,7 +1,7 @@
 ﻿using System;
 using ScriptableAsset.Core;
 
-namespace ScriptableAsset.Base
+namespace ScriptableAsset.Base.Primitive
 {
       [Serializable]
       public class ReactiveFloat : ReactiveValue<float>

@@ -18,6 +18,8 @@ namespace ScriptableAsset.Editor
             private const float HeaderSearchFieldMaxWidthPercentage = 0.25f;
             private const float HeaderSortButtonWidth = 70f;
             private const float HeaderScanButtonWidth = 90f;
+            private const float SectionSeparatorSpace = 15f;
+            private const float AddSectionTopSpace = 5f;
 
             // Constants for element layout
             private const float ElementColorBarWidth = 6f;
@@ -146,17 +148,24 @@ namespace ScriptableAsset.Editor
                         ValidateAllNames();
                   }
 
-                  if (_reorderableList != null)
+                  if (_allDataProperty.arraySize == 1)
                   {
-                        _reorderableList.DoLayoutList();
+                        DrawSingleDataObjectInspector();
                   }
                   else
                   {
-                        EditorGUILayout.HelpBox("Data list UI could not be initialized.", MessageType.Warning);
-                        EditorGUILayout.PropertyField(_allDataProperty, true);
-                  }
+                        if (_reorderableList != null)
+                        {
+                              _reorderableList.DoLayoutList();
+                        }
+                        else
+                        {
+                              EditorGUILayout.HelpBox("Data list UI could not be initialized.", MessageType.Warning);
+                              EditorGUILayout.PropertyField(_allDataProperty, true);
+                        }
 
-                  DrawAddDataSectionLayout();
+                        DrawAddDataSectionLayout();
+                  }
 
                   if (serializedObject.ApplyModifiedProperties())
                   {
