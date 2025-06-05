@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace ScriptableAsset.Core
 {
-      [CreateAssetMenu(fileName = "ScriptableAsset", menuName = "ScriptableObjects/ScriptableAsset", order = 1)]
+      [CreateAssetMenu(fileName = "NewScriptableAsset", menuName = "ScriptableObjects/ScriptableAsset", order = 1)]
       public sealed class ScriptableAsset : ScriptableObject
       {
             [SerializeReference] public List<DataObject> assetData = new();
@@ -13,14 +13,7 @@ namespace ScriptableAsset.Core
             private Dictionary<string, DataObject> _dataMap;
             private bool _isMapInitialized;
 
-            // Event to notify when any contained DataObject changes.
             public event Action<DataObject> OnAnyDataChanged;
-
-            private void OnEnable()
-            {
-                  // Build the map and subscribe to changes when the asset is enabled
-                  InitializeMapAndSubscribe();
-            }
 
             private void OnDisable()
             {
@@ -37,6 +30,13 @@ namespace ScriptableAsset.Core
                   OnAnyDataChanged = null;
             }
 
+#if UNITY_EDITOR
+
+            private void OnValidate()
+            {
+                  _isMapInitialized = false;
+            }
+#endif
 
             private void InitializeMapAndSubscribe()
             {
@@ -47,7 +47,12 @@ namespace ScriptableAsset.Core
 
                   _dataMap = new Dictionary<string, DataObject>(assetData.Count);
 
-                  foreach (DataObject data in assetData.Where(static data => data != null && !string.IsNullOrEmpty(data.name)))
+                  foreach (DataObject data in assetData.Where(static d => d != null))
+                  {
+                        data.OnAnyValueChanged -= HandleContainedDataChanged;
+                  }
+
+                  foreach (DataObject data in assetData.Where(static d => d != null && !string.IsNullOrEmpty(d.name)))
                   {
                         if (!_dataMap.TryAdd(data.name, data))
                         {
@@ -56,7 +61,6 @@ namespace ScriptableAsset.Core
                                           this);
                         }
 
-                        data.OnAnyValueChanged -= HandleContainedDataChanged;
                         data.OnAnyValueChanged += HandleContainedDataChanged;
                   }
 
@@ -68,15 +72,6 @@ namespace ScriptableAsset.Core
                   OnAnyDataChanged?.Invoke(changedData);
             }
 
-            /// <summary>
-            /// Retrieves the data object of a specified type by its name from the asset's internal data map.
-            /// </summary>
-            /// <typeparam name="T">The type of DataObject to retrieve.</typeparam>
-            /// <param name="dataName">The name of the data object to retrieve.</param>
-            /// <returns>
-            /// Returns the data object of type <typeparamref name="T"/> if found, otherwise returns null.
-            /// Logs a warning if the data object is not found or if its type does not match <typeparamref name="T"/>.
-            /// </returns>
             public T GetData<T>(string dataName) where T : DataObject
             {
                   if (!_isMapInitialized)
@@ -89,19 +84,9 @@ namespace ScriptableAsset.Core
                         return typedData;
                   }
 
-                  Debug.LogWarning($"[ScriptableAsset: {this.name}] Data '{dataName}' of type {typeof(T).Name} not found.", this);
-
                   return null;
             }
 
-            /// <summary>
-            /// Retrieves the data object by its name from the asset's internal data map.
-            /// </summary>
-            /// <param name="dataName">The name of the data object to retrieve.</param>
-            /// <returns>
-            /// Returns the data object if found, otherwise returns null.
-            /// Logs a warning if the data object is not found.
-            /// </returns>
             public DataObject GetData(string dataName)
             {
                   if (!_isMapInitialized)
@@ -109,14 +94,7 @@ namespace ScriptableAsset.Core
                         InitializeMapAndSubscribe();
                   }
 
-                  if (_dataMap.TryGetValue(dataName, out DataObject data))
-                  {
-                        return data;
-                  }
-
-                  Debug.LogWarning($"[ScriptableAsset: {this.name}] Data '{dataName}' not found.", this);
-
-                  return null;
+                  return _dataMap.GetValueOrDefault(dataName);
             }
       }
 }
