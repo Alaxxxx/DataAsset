@@ -13,8 +13,8 @@ namespace ScriptableAsset.Editor
       {
             // Constants for layout and styles
             private const float HeaderSpacing = 5f;
-            private const float HeaderRightMargin = 5f;
-            private const float HeaderSearchFieldMinWidth = 100f;
+            private const float HeaderRightMargin = 20f;
+            private const float HeaderSearchFieldMinWidth = 150f;
             private const float HeaderSearchFieldMaxWidthPercentage = 0.25f;
             private const float HeaderSortButtonWidth = 70f;
             private const float HeaderScanButtonWidth = 90f;
@@ -22,9 +22,9 @@ namespace ScriptableAsset.Editor
             private const float AddSectionTopSpace = 5f;
 
             // Constants for element layout
-            private const float ElementColorBarWidth = 6f;
-            private const float ElementDragHandleWidth = 20f;
-            private const float ElementContentPadding = 4f;
+            private const float ElementColorBarWidth = 4f;
+            private const float ElementDragHandleWidth = 10f;
+            private const float ElementContentPadding = 15f;
             private const float ElementNameLabelWidth = 40f;
             private const float ElementMinNameFieldWidth = 50f;
             private const float ElementTypePadding = 5f;
@@ -160,6 +160,7 @@ namespace ScriptableAsset.Editor
                         if (_reorderableList != null)
                         {
                               _reorderableList.DoLayoutList();
+                              DrawClearAllButton();
                         }
                         else
                         {

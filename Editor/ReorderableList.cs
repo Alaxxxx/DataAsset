@@ -188,6 +188,19 @@ namespace ScriptableAsset.Editor
                         return;
                   }
 
+                  Event currentEvent = Event.current;
+
+                  if (currentEvent.type == EventType.ContextClick && rect.Contains(currentEvent.mousePosition))
+                  {
+                        GenericMenu menu = new GenericMenu();
+
+                        // Passer l'index comme userData pour que les callbacks sachent quel élément cibler
+                        menu.AddItem(new GUIContent("Duplicate Item"), false, HandleDuplicateElementContext, index);
+                        menu.AddItem(new GUIContent("Delete Item"), false, HandleDeleteElementContext, index);
+                        menu.ShowAsContext();
+                        currentEvent.Use(); // Consommer l'événement pour éviter d'autres traitements
+                  }
+
                   // Draw the drag handle for the element
                   bool isDimmed = !string.IsNullOrEmpty(_searchText) &&
                                   !dataObject.name.ToLowerInvariant().Contains(_searchText.ToLowerInvariant(), StringComparison.Ordinal);
@@ -437,26 +450,15 @@ namespace ScriptableAsset.Editor
                         if (currentProp.propertyPath.EndsWith(".value", StringComparison.OrdinalIgnoreCase))
                         {
                               float originalLabelWidth = EditorGUIUtility.labelWidth;
+
                               EditorGUIUtility.labelWidth = ElementValueLabelWidth;
 
-                              // Draw the label for the property, ensuring it is aligned correctly
-                              EditorGUI.LabelField(new Rect(propRect.x, propRect.y, EditorGUIUtility.labelWidth, EditorGUIUtility.singleLineHeight),
-                                          new GUIContent(currentProp.displayName));
-
-                              // Draw the property field without the label, using the adjusted rectangle
-                              EditorGUI.PropertyField(new Rect(propRect.x + EditorGUIUtility.labelWidth,
-                                                      propRect.y,
-                                                      propRect.width - EditorGUIUtility.labelWidth,
-                                                      propRect.height),
-                                          currentProp,
-                                          GUIContent.none,
-                                          true);
+                              EditorGUI.PropertyField(propRect, currentProp, true);
 
                               EditorGUIUtility.labelWidth = originalLabelWidth;
                         }
                         else
                         {
-                              // Draw the property field with its label
                               EditorGUI.PropertyField(propRect, currentProp, true);
                         }
 
@@ -614,6 +616,151 @@ namespace ScriptableAsset.Editor
                   EditorUtility.SetDirty(_targetAsset);
                   this.serializedObject.ApplyModifiedProperties();
                   this.serializedObject.Update();
+            }
+
+            private void HandleDuplicateElementContext(object userData)
+            {
+                  int index = (int)userData;
+
+                  if (index < 0 || index >= _allDataProperty.arraySize)
+                  {
+                        return;
+                  }
+
+                  Undo.RecordObject(_targetAsset, "Duplicate Data Object");
+
+                  SerializedProperty sourceElement = _allDataProperty.GetArrayElementAtIndex(index);
+
+                  if (sourceElement.managedReferenceValue is not DataObject sourceDataObject)
+                  {
+                        return;
+                  }
+
+                  DataObject newInstance;
+
+                  try
+                  {
+                        newInstance = (DataObject)Activator.CreateInstance(sourceDataObject.GetType());
+
+                        string json = JsonUtility.ToJson(sourceDataObject);
+                        JsonUtility.FromJsonOverwrite(json, newInstance);
+
+                        string baseName = string.IsNullOrEmpty(sourceDataObject.name) ? "New" + newInstance.GetType().Name : sourceDataObject.name;
+
+                        if (!baseName.EndsWith("_Copy", StringComparison.OrdinalIgnoreCase))
+                        {
+                              baseName += "_Copy";
+                        }
+
+                        string potentialName = baseName;
+                        int counter = 1;
+                        List<string> existingNames = new List<string>();
+
+                        for (int i = 0; i < _allDataProperty.arraySize; ++i)
+                        {
+                              if (i == index)
+                              {
+                                    continue;
+                              }
+
+                              if (_allDataProperty.GetArrayElementAtIndex(i).managedReferenceValue is DataObject item)
+                              {
+                                    existingNames.Add(item.name);
+                              }
+                        }
+
+                        existingNames.Add(sourceDataObject.name);
+
+                        while (existingNames.Contains(potentialName))
+                        {
+                              potentialName = $"{baseName}{counter++}";
+                        }
+
+                        newInstance.name = potentialName;
+                  }
+                  catch (Exception ex)
+                  {
+                        Debug.LogError($"[ScriptableEditor] Error duplicating DataObject: {ex.Message}");
+
+                        return;
+                  }
+
+                  _allDataProperty.InsertArrayElementAtIndex(index + 1);
+                  SerializedProperty newElementProperty = _allDataProperty.GetArrayElementAtIndex(index + 1);
+                  newElementProperty.managedReferenceValue = newInstance;
+
+                  serializedObject.ApplyModifiedProperties();
+                  ValidateAllNames();
+                  EditorUtility.SetDirty(_targetAsset);
+                  Repaint();
+            }
+
+            private void HandleDeleteElementContext(object userData)
+            {
+                  int index = (int)userData;
+
+                  if (index < 0 || index >= _allDataProperty.arraySize)
+                  {
+                        return;
+                  }
+
+                  Undo.RecordObject(_targetAsset, "Delete Data Object");
+
+                  SerializedProperty element = _allDataProperty.GetArrayElementAtIndex(index);
+
+                  if (element.managedReferenceValue != null)
+                  {
+                        element.managedReferenceValue = null;
+                  }
+
+                  _foldoutUsageStates.Remove(index);
+
+                  _allDataProperty.DeleteArrayElementAtIndex(index);
+
+                  serializedObject.ApplyModifiedProperties();
+                  ValidateAllNames();
+                  EditorUtility.SetDirty(_targetAsset);
+                  Repaint();
+            }
+
+            private void DrawClearAllButton()
+            {
+                  if (_allDataProperty == null || _allDataProperty.arraySize == 0)
+                  {
+                        return;
+                  }
+
+                  EditorGUILayout.Space(10);
+
+                  EditorGUILayout.BeginHorizontal();
+                  GUILayout.FlexibleSpace();
+
+                  Color originalBgColor = GUI.backgroundColor;
+                  GUI.backgroundColor = new Color(1f, 0.6f, 0.6f, 1f);
+
+                  if (GUILayout.Button(new GUIContent(" Clear All Data Objects",
+                                              EditorGUIUtility.IconContent("d_TreeEditor.Trash").image,
+                                              "Removes ALL data objects from this asset."),
+                                  GUILayout.MaxWidth(250)) && EditorUtility.DisplayDialog("Clear All Data Objects",
+                                  $"Are you sure you want to remove all {_allDataProperty.arraySize} data objects from this asset? This action can be undone.",
+                                  "Clear All",
+                                  "Cancel"))
+                  {
+                        Undo.RecordObject(_targetAsset, "Clear All Data Objects");
+
+                        _allDataProperty.ClearArray();
+                        _foldoutUsageStates.Clear();
+                        _detailedDataUsages.Clear();
+                        ValidateAllNames();
+
+                        EditorUtility.SetDirty(_targetAsset);
+                        this.serializedObject.ApplyModifiedProperties();
+                        Repaint();
+                  }
+
+                  GUI.backgroundColor = originalBgColor;
+                  GUILayout.FlexibleSpace();
+                  EditorGUILayout.EndHorizontal();
             }
       }
 }
