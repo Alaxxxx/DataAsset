@@ -21,7 +21,7 @@ namespace ScriptableAsset.Editor
             /// <summary>
             /// Sorts the data objects in the editor based on the specified sort mode.
             /// </summary>
-            /// <param name="mode">The sorting mode to apply to the data objects.</param>
+            /// <param dataName="mode">The sorting mode to apply to the data objects.</param>
             /// <exception cref="ArgumentOutOfRangeException">Thrown when the specified sorting mode is not defined in <see cref="SortMode"/>.</exception>
             private void ApplySort(SortMode mode)
             {
@@ -42,11 +42,11 @@ namespace ScriptableAsset.Editor
                   switch (mode)
                   {
                         case SortMode.ByNameAsc:
-                              tempList.Sort(static (a, b) => string.Compare(a?.name, b?.name, StringComparison.OrdinalIgnoreCase));
+                              tempList.Sort(static (a, b) => string.Compare(a?.dataName, b?.dataName, StringComparison.OrdinalIgnoreCase));
 
                               break;
                         case SortMode.ByNameDesc:
-                              tempList.Sort(static (a, b) => string.Compare(b?.name, a?.name, StringComparison.OrdinalIgnoreCase));
+                              tempList.Sort(static (a, b) => string.Compare(b?.dataName, a?.dataName, StringComparison.OrdinalIgnoreCase));
 
                               break;
                         case SortMode.ByType:

@@ -10,7 +10,7 @@ namespace ScriptableAsset.Base.Primitive
             {
             }
 
-            public ReactiveString(string name, string initialValue) : base(name, initialValue)
+            public ReactiveString(string dataName, string initialValue) : base(dataName, initialValue)
             {
             }
       }

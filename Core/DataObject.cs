@@ -5,37 +5,34 @@ namespace ScriptableAsset.Core
       [Serializable]
       public abstract class DataObject
       {
-            public string name;
+            // The name of the data object, used for identification
+            public string dataName;
 
-            /// <summary>
-            /// Event that is triggered when any property or value within the <see cref="DataObject"/> instance changes.
-            /// </summary>
-            /// <remarks>
-            /// Subscribing to this event allows listeners to react whenever a change occurs in the data contained
-            /// within the concerned <see cref="DataObject"/>. Changes are detected and notification is dispatched
-            /// based on the invocation of the <see cref="DataObject.NotifyChange"/> method.
-            /// This event is cleared of all subscribers when <see cref="DataObject.ClearAllSubscriptions"/> is called.
-            /// </remarks>
-            /// <example>
-            /// Note: Direct usage examples are not provided. Ensure proper subscription and unsubscription practices
-            /// for handling the event to avoid memory leaks or unexpected behavior.
-            /// </example>
+            // Event triggered when the value of the data object changes
             [field: NonSerialized]
-            public event Action<DataObject> OnAnyValueChanged;
+            public event Action<DataObject> OnDataChanged;
 
-            protected DataObject(string name = "Data")
+#region Constructors
+
+            protected DataObject(string dataName = "Data")
             {
-                  this.name = name;
+                  this.dataName = dataName;
             }
 
-            protected virtual void NotifyChange()
+#endregion
+
+#region Events
+
+            protected virtual void TriggerChange()
             {
-                  OnAnyValueChanged?.Invoke(this);
+                  OnDataChanged?.Invoke(this);
             }
 
-            public virtual void ClearAllSubscriptions()
+            protected virtual void ClearSubscriptions()
             {
-                  OnAnyValueChanged = null;
+                  OnDataChanged = null;
             }
+
+#endregion
       }
 }

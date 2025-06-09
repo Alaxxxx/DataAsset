@@ -9,7 +9,7 @@ namespace ScriptableAsset.Core
       /// <summary>
       /// Represents a reactive list that notifies subscribers about changes in its content such as additions, removals, and updates.
       /// </summary>
-      /// <typeparam name="TItem">The type of the elements in the list.</typeparam>
+      /// <typeparam dataName="TItem">The type of the elements in the list.</typeparam>
       [Serializable]
       public abstract class ReactiveList<TItem> : DataObject, IList<TItem>, IReadOnlyList<TItem>
       {
@@ -26,12 +26,12 @@ namespace ScriptableAsset.Core
             {
             }
 
-            protected ReactiveList(string name) : base(name)
+            protected ReactiveList(string dataName) : base(dataName)
             {
                   items = new List<TItem>();
             }
 
-            protected ReactiveList(string name, IEnumerable<TItem> initialItems) : base(name)
+            protected ReactiveList(string dataName, IEnumerable<TItem> initialItems) : base(dataName)
             {
                   items = new List<TItem>(initialItems);
             }
@@ -56,7 +56,6 @@ namespace ScriptableAsset.Core
                         items[index] = value;
                         OnItemSet?.Invoke(oldItem, value, index);
                         OnCollectionChanged?.Invoke();
-                        NotifyChange();
                   }
             }
 
@@ -69,7 +68,6 @@ namespace ScriptableAsset.Core
                   items.Add(item);
                   OnItemAdded?.Invoke(item, newIndex);
                   OnCollectionChanged?.Invoke();
-                  NotifyChange();
             }
 
             public void AddRange(IEnumerable<TItem> collection)
@@ -89,7 +87,6 @@ namespace ScriptableAsset.Core
                   items.AddRange(itemsToAdd);
 
                   OnCollectionChanged?.Invoke();
-                  NotifyChange();
             }
 
             public void Clear()
@@ -102,7 +99,6 @@ namespace ScriptableAsset.Core
                   items.Clear();
                   OnListCleared?.Invoke();
                   OnCollectionChanged?.Invoke();
-                  NotifyChange();
             }
 
             public bool Contains(TItem item) => items.Contains(item);
@@ -116,7 +112,6 @@ namespace ScriptableAsset.Core
                   items.Insert(index, item);
                   OnItemAdded?.Invoke(item, index);
                   OnCollectionChanged?.Invoke();
-                  NotifyChange();
             }
 
             public bool Remove(TItem item)
@@ -134,7 +129,6 @@ namespace ScriptableAsset.Core
                   {
                         OnItemRemoved?.Invoke(item, index);
                         OnCollectionChanged?.Invoke();
-                        NotifyChange();
                   }
 
                   return removed;
@@ -151,29 +145,18 @@ namespace ScriptableAsset.Core
                   items.RemoveAt(index);
                   OnItemRemoved?.Invoke(removedItem, index);
                   OnCollectionChanged?.Invoke();
-                  NotifyChange();
             }
 
             public IEnumerator<TItem> GetEnumerator() => items.GetEnumerator();
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-            public override void ClearAllSubscriptions()
-            {
-                  base.ClearAllSubscriptions();
-                  OnCollectionChanged = null;
-                  OnItemAdded = null;
-                  OnItemRemoved = null;
-                  OnItemSet = null;
-                  OnListCleared = null;
-            }
 
             public List<TItem> GetRawListCopy() => new(items);
 
             public void NotifyListChangedExternally()
             {
                   OnCollectionChanged?.Invoke();
-                  NotifyChange();
             }
 
             public override string ToString() => $"ReactiveList<{typeof(TItem).Name}> (Count = {Count})";

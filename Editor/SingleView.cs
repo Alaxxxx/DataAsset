@@ -37,13 +37,13 @@ namespace ScriptableAsset.Editor
 
                   GUILayout.Space(ElementColorBarWidth + 4);
 
-                  string headerTitle = $"{_targetAsset.name}: {dataObject.name} ({dataObject.GetType().Name})";
+                  string headerTitle = $"{_targetAsset.name}: {dataObject.dataName} ({dataObject.GetType().Name})";
                   GUILayout.Label(new GUIContent(headerTitle, "Currently editing this single data object."), EditorStyles.boldLabel);
                   GUILayout.FlexibleSpace();
 
                   GUIContent scanButtonContent = _isScanningUsages
-                              ? new GUIContent("Scanning...", "Scanning for usages of " + dataObject.name)
-                              : new GUIContent("Scan Usages", "Scan for usages of " + dataObject.name);
+                              ? new GUIContent("Scanning...", "Scanning for usages of " + dataObject.dataName)
+                              : new GUIContent("Scan Usages", "Scan for usages of " + dataObject.dataName);
                   EditorGUI.BeginDisabledGroup(_isScanningUsages);
 
                   if (GUILayout.Button(scanButtonContent, EditorStyles.toolbarButton, GUILayout.Width(HeaderScanButtonWidth)))
@@ -56,13 +56,13 @@ namespace ScriptableAsset.Editor
 
                   EditorGUILayout.Space(SmallVerticalSpacing);
 
-                  SerializedProperty nameProperty = singleElementProperty.FindPropertyRelative("name");
+                  SerializedProperty nameProperty = singleElementProperty.FindPropertyRelative("dataName");
 
                   if (nameProperty != null)
                   {
                         EditorGUILayout.BeginHorizontal();
 
-                        EditorGUILayout.LabelField(new GUIContent("Identifier Name", "The unique name to retrieve this data."),
+                        EditorGUILayout.LabelField(new GUIContent("Identifier Name", "The unique dataName to retrieve this data."),
                                     GUILayout.Width(EditorGUIUtility.labelWidth - 5));
                         EditorGUI.BeginChangeCheck();
                         EditorGUILayout.PropertyField(nameProperty, GUIContent.none);
@@ -88,7 +88,7 @@ namespace ScriptableAsset.Editor
                               break;
                         }
 
-                        if (currentProp.name == "name")
+                        if (currentProp.name == "dataName")
                         {
                               continue;
                         }
@@ -107,7 +107,7 @@ namespace ScriptableAsset.Editor
                   }
 
                   List<UsageInfo> usages = null;
-                  bool hasUsages = _detailedDataUsages != null && _detailedDataUsages.TryGetValue(dataObject.name, out usages) && usages.Count > 0;
+                  bool hasUsages = _detailedDataUsages != null && _detailedDataUsages.TryGetValue(dataObject.dataName, out usages) && usages.Count > 0;
 
                   if (hasUsages)
                   {
@@ -168,8 +168,8 @@ namespace ScriptableAsset.Editor
                   Color originalBgColor = GUI.backgroundColor;
                   GUI.backgroundColor = new Color(1f, 0.6f, 0.6f, 1f);
 
-                  if (GUILayout.Button(new GUIContent(" Clear", EditorGUIUtility.IconContent("Toolbar Minus").image, "Removes this data object."),
-                                  GUILayout.MaxWidth(200)))
+                  if (GUILayout.Button(new GUIContent(" Clear", EditorGUIUtility.IconContent("Toolbar Minus").image, "Remove this data object."),
+                                  GUILayout.MaxWidth(150)))
                   {
                         _allDataProperty.ClearArray();
                         ValidateAllNames();

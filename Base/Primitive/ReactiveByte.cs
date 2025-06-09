@@ -10,7 +10,7 @@ namespace ScriptableAsset.Base.Primitive
             {
             }
 
-            public ReactiveByte(string name, byte initialValue) : base(name, initialValue)
+            public ReactiveByte(string dataName, byte initialValue) : base(dataName, initialValue)
             {
             }
       }

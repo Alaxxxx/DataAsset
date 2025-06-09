@@ -15,7 +15,7 @@ namespace ScriptableAsset.Editor
             /// </summary>
             /// <remarks>
             /// - This method iterates through a serialized array property (`_allDataProperty`) to extract and validate names.
-            /// - If a name is found to be non-unique across the collection, its index is flagged as duplicate in the `_isNameDuplicate` dictionary.
+            /// - If a dataName is found to be non-unique across the collection, its index is flagged as duplicate in the `_isNameDuplicate` dictionary.
             /// - Empty or null names are ignored during the validation process.
             /// - The method will return early if `_allDataProperty` is null.
             /// </remarks>
@@ -35,7 +35,7 @@ namespace ScriptableAsset.Editor
                   for (int i = 0; i < _allDataProperty.arraySize; i++)
                   {
                         SerializedProperty element = _allDataProperty.GetArrayElementAtIndex(i);
-                        names.Add(element.managedReferenceValue is DataObject dataObject ? dataObject.name : null);
+                        names.Add(element.managedReferenceValue is DataObject dataObject ? dataObject.dataName : null);
                   }
 
                   for (int i = 0; i < names.Count; i++)

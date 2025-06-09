@@ -3,7 +3,7 @@
 namespace ScriptableAsset.Core.Struct
 {
       [Serializable]
-      public struct UsageInfo
+      public struct UsageInfo : IEquatable<UsageInfo>
       {
             public string scriptName;
             public string scriptPath;
@@ -32,6 +32,11 @@ namespace ScriptableAsset.Core.Struct
                   return !string.IsNullOrEmpty(gameObjectName)
                               ? $"Script: {scriptName}{lineInfo} on GO: {gameObjectName} (in {containerType}: {containerName})"
                               : $"Script: {scriptName}{lineInfo} (in {containerType}: {containerName})";
+            }
+
+            public bool Equals(UsageInfo other)
+            {
+                  return scriptName == other.scriptName && scriptPath == other.scriptPath;
             }
       }
 }

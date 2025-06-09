@@ -82,9 +82,9 @@ namespace ScriptableAsset.Editor
 
                   for (int i = 0; i < _allDataProperty.arraySize; i++)
                   {
-                        if (_allDataProperty.GetArrayElementAtIndex(i).managedReferenceValue is DataObject dataObj && !string.IsNullOrEmpty(dataObj.name))
+                        if (_allDataProperty.GetArrayElementAtIndex(i).managedReferenceValue is DataObject dataObj && !string.IsNullOrEmpty(dataObj.dataName))
                         {
-                              _detailedDataUsages[dataObj.name] = new List<UsageInfo>();
+                              _detailedDataUsages[dataObj.dataName] = new List<UsageInfo>();
                               currentDataObjects.Add(dataObj);
                         }
                   }
@@ -98,7 +98,7 @@ namespace ScriptableAsset.Editor
                         yield break;
                   }
 
-                  var scriptsToAnalyzeWithContext = new List<ScriptToAnalyzeContext>();
+                  var scriptsToAnalyzeWithContext = new List<ScriptContext>();
                   string targetAssetPath = AssetDatabase.GetAssetPath(_targetAsset);
 
                   string[] prefabGuids = AssetDatabase.FindAssets("t:Prefab");
@@ -135,7 +135,7 @@ namespace ScriptableAsset.Editor
 
                                           if (ms)
                                           {
-                                                scriptsToAnalyzeWithContext.Add(new ScriptToAnalyzeContext
+                                                scriptsToAnalyzeWithContext.Add(new ScriptContext
                                                 {
                                                             Script = ms,
                                                             ReferencingContainerType = "Prefab",
@@ -184,7 +184,7 @@ namespace ScriptableAsset.Editor
 
                                           if (ms)
                                           {
-                                                scriptsToAnalyzeWithContext.Add(new ScriptToAnalyzeContext
+                                                scriptsToAnalyzeWithContext.Add(new ScriptContext
                                                 {
                                                             Script = ms,
                                                             ReferencingContainerType = "ScriptableObject",
@@ -236,7 +236,7 @@ namespace ScriptableAsset.Editor
 
                                                 if (ms)
                                                 {
-                                                      scriptsToAnalyzeWithContext.Add(new ScriptToAnalyzeContext
+                                                      scriptsToAnalyzeWithContext.Add(new ScriptContext
                                                       {
                                                                   Script = ms,
                                                                   ReferencingContainerType = "Scene",
@@ -270,7 +270,7 @@ namespace ScriptableAsset.Editor
 
                   for (int k = 0; k < scriptsToAnalyzeWithContext.Count; k++)
                   {
-                        ScriptToAnalyzeContext context = scriptsToAnalyzeWithContext[k];
+                        ScriptContext context = scriptsToAnalyzeWithContext[k];
                         string scriptPath = AssetDatabase.GetAssetPath(context.Script);
                         string scriptName = Path.GetFileName(scriptPath);
 
@@ -289,12 +289,12 @@ namespace ScriptableAsset.Editor
 
                               foreach (DataObject dataItem in currentDataObjects)
                               {
-                                    if (string.IsNullOrEmpty(dataItem.name))
+                                    if (string.IsNullOrEmpty(dataItem.dataName))
                                     {
                                           continue;
                                     }
 
-                                    string escapedName = Regex.Escape(dataItem.name);
+                                    string escapedName = Regex.Escape(dataItem.dataName);
 
                                     Action<Match> addUsageWithLineNumber = match =>
                                     {
@@ -310,7 +310,7 @@ namespace ScriptableAsset.Editor
                                                 }
                                           }
 
-                                          _detailedDataUsages[dataItem.name]
+                                          _detailedDataUsages[dataItem.dataName]
                                                       .Add(new UsageInfo(scriptName,
                                                                   scriptPath,
                                                                   context.ReferencingContainerType,

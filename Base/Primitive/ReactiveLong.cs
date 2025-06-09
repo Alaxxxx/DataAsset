@@ -8,7 +8,7 @@ namespace ScriptableAsset.Base.Primitive
             {
             }
 
-            public ReactiveLong(string name, long initialValue) : base(name, initialValue)
+            public ReactiveLong(string dataName, long initialValue) : base(dataName, initialValue)
             {
             }
       }

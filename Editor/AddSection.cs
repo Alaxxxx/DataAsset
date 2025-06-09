@@ -9,45 +9,14 @@ namespace ScriptableAsset.Editor
 {
       public sealed partial class ScriptableEditor
       {
-            /// <summary>
-            /// Resets all pending data fields to their default values.
-            /// </summary>
-            /// <remarks>
-            /// This method is used to clear any intermediate data stored in pending fields.
-            /// It sets all fields such as pending type, name, and various primitive type values
-            /// to null, empty, or their default initialized state.
-            /// Ensure this is used in scenarios where pending data should be discarded and reset to avoid unintended behavior or stale data.
-            /// </remarks>
-            private void ResetPendingData()
-            {
-                  _pendingType = null;
-                  _pendingName = "";
-                  _pendingIntValue = 0;
-                  _pendingStringValue = "";
-                  _pendingBoolValue = false;
-                  _pendingByteValue = 0;
-                  _pendingShortValue = 0;
-                  _pendingFloatValue = 0f;
-                  _pendingLongValue = 0L;
-            }
-
-            /// <summary>
-            /// Renders the layout for adding new data entries within the editor UI.
-            /// </summary>
-            /// <remarks>
-            /// This method displays a section in the custom inspector where users can configure and add new data entries.
-            /// It includes separators and informational messages for better clarity and user guidance.
-            /// If no compatible data types are available, an information message is displayed.
-            /// The method dynamically updates the UI based on the availability of data types or pending selections.
-            /// </remarks>
             private void DrawAddDataSectionLayout()
             {
-                  EditorGUILayout.Space(15);
+                  EditorGUILayout.Space(SectionSeparatorSpace);
                   Rect separatorRect = EditorGUILayout.GetControlRect(false, 1);
                   separatorRect.x -= 2;
                   separatorRect.width += 4;
                   EditorGUI.DrawRect(separatorRect, new Color(0.5f, 0.5f, 0.5f, 0.5f));
-                  EditorGUILayout.Space(5);
+                  EditorGUILayout.Space(AddSectionTopSpace);
 
                   EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                   EditorGUILayout.LabelField("Add New Data", EditorStyles.boldLabel);
@@ -79,7 +48,7 @@ namespace ScriptableAsset.Editor
                                           {
                                                 if (_allDataProperty.GetArrayElementAtIndex(i).managedReferenceValue is DataObject item)
                                                 {
-                                                      existingNames.Add(item.name);
+                                                      existingNames.Add(item.dataName);
                                                 }
                                           }
                                     }
@@ -171,8 +140,7 @@ namespace ScriptableAsset.Editor
 
                               if (!isBaseTypeHandledForConfig && typeof(DataObject).IsAssignableFrom(_pendingType))
                               {
-                                    EditorGUILayout.HelpBox($"'{_pendingType.Name}' will be added with default values.",
-                                                MessageType.Info);
+                                    EditorGUILayout.HelpBox($"'{_pendingType.Name}' will be added with default values.", MessageType.Info);
                               }
 
                               EditorGUILayout.Space(5);
@@ -183,7 +151,7 @@ namespace ScriptableAsset.Editor
                                     try
                                     {
                                           var newDataInstance = (DataObject)Activator.CreateInstance(_pendingType);
-                                          newDataInstance.name = _pendingName;
+                                          newDataInstance.dataName = _pendingName;
 
                                           switch (newDataInstance)
                                           {
@@ -248,6 +216,19 @@ namespace ScriptableAsset.Editor
                   }
 
                   EditorGUILayout.EndVertical();
+            }
+
+            private void ResetPendingData()
+            {
+                  _pendingType = null;
+                  _pendingName = "";
+                  _pendingIntValue = 0;
+                  _pendingStringValue = "";
+                  _pendingBoolValue = false;
+                  _pendingByteValue = 0;
+                  _pendingShortValue = 0;
+                  _pendingFloatValue = 0f;
+                  _pendingLongValue = 0L;
             }
       }
 }

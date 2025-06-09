@@ -10,7 +10,7 @@ namespace ScriptableAsset.Base.Primitive
             {
             }
 
-            public ReactiveBool(string name, bool initialValue) : base(name, initialValue)
+            public ReactiveBool(string dataName, bool initialValue) : base(dataName, initialValue)
             {
             }
       }

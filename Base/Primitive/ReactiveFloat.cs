@@ -10,7 +10,7 @@ namespace ScriptableAsset.Base.Primitive
             {
             }
 
-            public ReactiveFloat(string name, float initialValue) : base(name, initialValue)
+            public ReactiveFloat(string dataName, float initialValue) : base(dataName, initialValue)
             {
             }
       }

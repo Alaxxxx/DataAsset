@@ -17,7 +17,7 @@ namespace ScriptableAsset.Editor
             /// </summary>
             /// <remarks>
             /// This method scans all loaded assemblies to find non-abstract subclasses of `DataObject`,
-            /// orders them by their full type name, and processes them to prepare for usage in the ScriptableEditor UI.
+            /// orders them by their full type dataName, and processes them to prepare for usage in the ScriptableEditor UI.
             /// If an error occurs during the reflection process, the data type arrays and collections
             /// are reset to empty states, and an error message is logged.
             /// </remarks>
@@ -50,10 +50,10 @@ namespace ScriptableAsset.Editor
                               foundDataObjectSubclasses.AddRange(typesFromAssembly.Where(static type => type.IsSubclassOf(typeof(DataObject)) && !type.IsAbstract));
                         }
 
-                        // Sort the found types by their full name
+                        // Sort the found types by their full dataName
                         _dataTypes = foundDataObjectSubclasses.OrderBy(static t => t.FullName).ToArray();
 
-                        // Create a display name for each type, removing the "Reactive" prefix and formatting namespaces
+                        // Create a display dataName for each type, removing the "Reactive" prefix and formatting namespaces
                         _dataTypeDisplayNames = _dataTypes.Select(static t =>
                                                           {
                                                                 string originalName = t.Name;
@@ -68,9 +68,9 @@ namespace ScriptableAsset.Editor
 
                                                                 string ns = t.Namespace ?? "";
 
-                                                                if (ns.StartsWith("ScriptableAsset.", StringComparison.Ordinal))
+                                                                if (ns.StartsWith("DataAsset.", StringComparison.Ordinal))
                                                                 {
-                                                                      ns = ns["ScriptableAsset.".Length..];
+                                                                      ns = ns["DataAsset.".Length..];
                                                                 }
 
                                                                 if (ns == "Base")
@@ -95,7 +95,7 @@ namespace ScriptableAsset.Editor
                         // Initialize random state to ensure consistent color generation
                         Random.State previousRandomState = Random.state;
 
-                        // Generate a unique color for each data type based on its name
+                        // Generate a unique color for each data type based on its dataName
                         foreach (Type type in _dataTypes)
                         {
                               Random.InitState(type.FullName?.GetHashCode() ?? type.Name.GetHashCode());

@@ -7,7 +7,7 @@ using UnityEngine;
 namespace ScriptableAsset.Editor
 {
       [CustomPropertyDrawer(typeof(RequireDataKeysAttribute))]
-      public class RequireDataKeysDrawer : PropertyDrawer
+      public class AttributeRequiredDrawer : PropertyDrawer
       {
             private const float WarningBoxSpacing = 2f;
             private const float HelpBoxAdditionalVerticalPadding = 10f;
@@ -22,7 +22,7 @@ namespace ScriptableAsset.Editor
                         return;
                   }
 
-                  var soAsset = property.objectReferenceValue as Core.ScriptableAsset;
+                  var soAsset = property.objectReferenceValue as Core.DataAsset;
                   string message = null;
                   var messageType = MessageType.None;
 
@@ -39,7 +39,7 @@ namespace ScriptableAsset.Editor
                   }
                   else
                   {
-                        message = $"Assigned object is not a '{nameof(Core.ScriptableAsset)}'. Expected type: {typeof(Core.ScriptableAsset).FullName}";
+                        message = $"Assigned object is not a '{nameof(Core.DataAsset)}'. Expected type: {typeof(Core.DataAsset).FullName}";
                         messageType = MessageType.Error;
                   }
 
@@ -59,7 +59,7 @@ namespace ScriptableAsset.Editor
                   {
                         string messageContentForHeight = null;
 
-                        if (property.objectReferenceValue is Core.ScriptableAsset soAsset)
+                        if (property.objectReferenceValue is Core.DataAsset soAsset)
                         {
                               var keysAttribute = (RequireDataKeysAttribute)this.attribute;
                               List<string> missingKeys = GetMissingKeys(soAsset, keysAttribute.RequiredKeys);
@@ -71,7 +71,7 @@ namespace ScriptableAsset.Editor
                         }
                         else
                         {
-                              messageContentForHeight = $"Assigned object is not a '{nameof(Core.ScriptableAsset)}'.";
+                              messageContentForHeight = $"Assigned object is not a '{nameof(Core.DataAsset)}'.";
                         }
 
                         if (messageContentForHeight != null)
@@ -83,7 +83,7 @@ namespace ScriptableAsset.Editor
                   return height;
             }
 
-            private static List<string> GetMissingKeys(Core.ScriptableAsset asset, string[] requiredKeys)
+            private static List<string> GetMissingKeys(Core.DataAsset asset, string[] requiredKeys)
             {
                   var missingKeys = new List<string>();
 

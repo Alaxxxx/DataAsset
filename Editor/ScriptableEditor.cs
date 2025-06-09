@@ -8,15 +8,15 @@ using UnityEngine;
 
 namespace ScriptableAsset.Editor
 {
-      [CustomEditor(typeof(Core.ScriptableAsset))]
+      [CustomEditor(typeof(Core.DataAsset))]
       public sealed partial class ScriptableEditor : UnityEditor.Editor
       {
             // Constants for layout and styles
             private const float HeaderSpacing = 5f;
-            private const float HeaderRightMargin = 20f;
-            private const float HeaderSearchFieldMinWidth = 150f;
-            private const float HeaderSearchFieldMaxWidthPercentage = 0.25f;
-            private const float HeaderSortButtonWidth = 70f;
+            private const float HeaderRightMargin = 10f;
+            private const float HeaderSearchFieldMinWidth = 100f;
+            private const float HeaderSearchFieldMaxWidthPercentage = 0.1f;
+            private const float HeaderSortButtonWidth = 60f;
             private const float HeaderScanButtonWidth = 90f;
             private const float SectionSeparatorSpace = 15f;
             private const float AddSectionTopSpace = 5f;
@@ -35,7 +35,7 @@ namespace ScriptableAsset.Editor
             private const float SmallVerticalSpacing = 2f;
 
             // The target asset being edited
-            private Core.ScriptableAsset _targetAsset;
+            private Core.DataAsset _targetAsset;
 
             // Serialized property for the list of data objects
             private SerializedProperty _allDataProperty;
@@ -90,7 +90,7 @@ namespace ScriptableAsset.Editor
             private void OnEnable()
             {
                   // Initialize the target asset and serialized properties
-                  _targetAsset = (Core.ScriptableAsset)target;
+                  _targetAsset = (Core.DataAsset)target;
 
                   if (!_targetAsset)
                   {
@@ -100,12 +100,12 @@ namespace ScriptableAsset.Editor
                   }
 
                   // Find the serialized property for the asset data
-                  _allDataProperty = serializedObject.FindProperty("assetData");
+                  _allDataProperty = serializedObject.FindProperty("dataList");
 
                   // Check if the property is found and is an array/list
                   if (_allDataProperty is not { isArray: true })
                   {
-                        Debug.LogError($"[ScriptableEditor] SerializedProperty 'assetData' not found or is not a list/array in '{_targetAsset.name}'.");
+                        Debug.LogError($"[ScriptableEditor] SerializedProperty 'dataList' not found or is not a list/array in '{_targetAsset.name}'.");
                         _allDataProperty = null;
 
                         return;
@@ -140,7 +140,7 @@ namespace ScriptableAsset.Editor
 
                   if (_allDataProperty == null)
                   {
-                        EditorGUILayout.HelpBox("Failed to initialize data property ('assetData').", MessageType.Error);
+                        EditorGUILayout.HelpBox("Failed to initialize data property ('dataList').", MessageType.Error);
                         DrawDefaultInspector();
 
                         return;

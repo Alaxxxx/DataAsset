@@ -10,7 +10,7 @@ namespace ScriptableAsset.Base.Collection
             {
             }
 
-            public StringList(string name) : base(name)
+            public StringList(string dataName) : base(dataName)
             {
             }
       }

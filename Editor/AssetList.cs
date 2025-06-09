@@ -50,7 +50,7 @@ namespace ScriptableAsset.Editor
             /// <summary>
             /// Draws the header for the reorderable list in the ScriptableEditor, displaying label and control elements.
             /// </summary>
-            /// <param name="rect">The rectangle on the GUI where the header will be rendered.</param>
+            /// <param dataName="rect">The rectangle on the GUI where the header will be rendered.</param>
             /// <remarks>
             /// This method renders the "Data Objects" label in the header of the reorderable list along with controls for searching,
             /// sorting, and a button for triggering additional actions.
@@ -62,7 +62,7 @@ namespace ScriptableAsset.Editor
                   float currentX = rect.x;
 
                   // Draw the header label for the list
-                  var titleContent = new GUIContent("Data Objects");
+                  var titleContent = new GUIContent("Data");
 
                   // Calculate the width of the title label and adjust the current X position accordingly
                   float titleWidth = EditorStyles.label.CalcSize(titleContent).x;
@@ -86,11 +86,11 @@ namespace ScriptableAsset.Editor
             /// <summary>
             /// Draws the search and sort controls within the list header of the ScriptableEditor UI.
             /// </summary>
-            /// <param name="rect">The rectangular area where the search field and sorting buttons will be drawn.</param>
+            /// <param dataName="rect">The rectangular area where the search field and sorting buttons will be drawn.</param>
             /// <remarks>
             /// This method displays a search input field and sorting buttons for the ScriptableEditor ReorderableList.
             /// The search field allows filtering of the displayed items based on the text input.
-            /// The sorting buttons provide options for sorting the list by name (ascending and descending) or by type.
+            /// The sorting buttons provide options for sorting the list by dataName (ascending and descending) or by type.
             /// Each control is positioned dynamically based on the available width within the specified rect.
             /// </remarks>
             private void DrawSearchAndSortControls(Rect rect)
@@ -115,7 +115,7 @@ namespace ScriptableAsset.Editor
 
                   currentX += HeaderSortButtonWidth;
 
-                  // Draw the sort button for descending name order
+                  // Draw the sort button for descending dataName order
                   if (GUI.Button(new Rect(currentX, rect.y, HeaderSortButtonWidth, EditorGUIUtility.singleLineHeight), "Name ▲", EditorStyles.toolbarButton))
                   {
                         ApplySort(SortMode.ByNameDesc);
@@ -131,7 +131,7 @@ namespace ScriptableAsset.Editor
             }
 
             /// <summary>
-            /// Renders a button in the editor interface that initiates a scan for data name usages across scripts in the project.
+            /// Renders a button in the editor interface that initiates a scan for data dataName usages across scripts in the project.
             /// </summary>
             /// <remarks>
             /// The button's label changes based on the scanning state to indicate whether the scan is currently in progress ("Scanning...")
@@ -139,13 +139,13 @@ namespace ScriptableAsset.Editor
             /// When the scan is in progress, the button is disabled to prevent additional scans from being triggered simultaneously.
             /// Upon activation, the button calls the `StartScanForDataUsages` method to handle the scanning logic.
             /// </remarks>
-            /// <param name="rect">The rectangular area within the editor interface where the button is drawn.</param>
+            /// <param dataName="rect">The rectangular area within the editor interface where the button is drawn.</param>
             private void DrawScanButton(Rect rect)
             {
                   // Used to display the button label and tooltip
                   GUIContent scanButtonContent = _isScanningUsages
                               ? new GUIContent("Scanning...", "Scanning project for data usages")
-                              : new GUIContent("Scan Usages", "Scan scripts for data name usages");
+                              : new GUIContent("Scan Usages", "Scan scripts for data dataName usages");
                   EditorGUI.BeginDisabledGroup(_isScanningUsages);
 
                   // Draw the scan button with the appropriate label and tooltip
@@ -160,10 +160,10 @@ namespace ScriptableAsset.Editor
             /// <summary>
             /// Renders an element within the reorderable list, including its background, content, and interactive properties.
             /// </summary>
-            /// <param name="rect">The rectangular area allocated for drawing the element.</param>
-            /// <param name="index">The index of the element within the serialized property array.</param>
-            /// <param name="isActive">Indicates whether the element is currently active in the list (e.g., selected).</param>
-            /// <param name="isFocused">Indicates whether the element currently has focus in the list.</param>
+            /// <param dataName="rect">The rectangular area allocated for drawing the element.</param>
+            /// <param dataName="index">The index of the element within the serialized property array.</param>
+            /// <param dataName="isActive">Indicates whether the element is currently active in the list (e.g., selected).</param>
+            /// <param dataName="isFocused">Indicates whether the element currently has focus in the list.</param>
             /// <remarks>
             /// This method handles the rendering out of each data element in the reorderable list.
             /// It accounts for active and focused states and applies conditional styling,
@@ -203,7 +203,7 @@ namespace ScriptableAsset.Editor
 
                   // Draw the drag handle for the element
                   bool isDimmed = !string.IsNullOrEmpty(_searchText) &&
-                                  !dataObject.name.ToLowerInvariant().Contains(_searchText.ToLowerInvariant(), StringComparison.Ordinal);
+                                  !dataObject.dataName.ToLowerInvariant().Contains(_searchText.ToLowerInvariant(), StringComparison.Ordinal);
 
                   var elementBackgroundRect = new Rect(rect.x + ElementDragHandleWidth, rect.y + 1, rect.width - ElementDragHandleWidth - 1, rect.height - 2);
                   GUI.Box(elementBackgroundRect, GUIContent.none, _blockStyle);
@@ -232,7 +232,7 @@ namespace ScriptableAsset.Editor
                               contentRect.width - ElementColorBarWidth - ElementContentPadding,
                               contentRect.height);
 
-                  // Draw the header line, usage details, name error, and properties for the element
+                  // Draw the header line, usage details, dataName error, and properties for the element
                   float currentY = fieldsRect.y;
                   currentY = DrawElementHeaderLine(fieldsRect, fieldsRect.width, currentY, dataObject, element, index);
                   currentY = DrawElementUsageDetails(fieldsRect, fieldsRect.width, currentY, dataObject, index);
@@ -247,14 +247,14 @@ namespace ScriptableAsset.Editor
             }
 
             /// <summary>
-            /// Draws the header line for an element in the reorderable list, including name, type, and usage information.
+            /// Draws the header line for an element in the reorderable list, including dataName, type, and usage information.
             /// </summary>
-            /// <param name="areaRect">The area rectangle defining the bounds of the current UI element in the list.</param>
-            /// <param name="availableWidth">The total width available for drawing the element's header line.</param>
-            /// <param name="startY">The vertical starting position for drawing the header line.</param>
-            /// <param name="dataObject">The data object associated with the current element to present relevant information.</param>
-            /// <param name="element">The serialized property representing the list element's data to be rendered.</param>
-            /// <param name="index">The index of the current element within the reorderable list, used for contextual rendering.</param>
+            /// <param dataName="areaRect">The area rectangle defining the bounds of the current UI element in the list.</param>
+            /// <param dataName="availableWidth">The total width available for drawing the element's header line.</param>
+            /// <param dataName="startY">The vertical starting position for drawing the header line.</param>
+            /// <param dataName="dataObject">The data object associated with the current element to present relevant information.</param>
+            /// <param dataName="element">The serialized property representing the list element's data to be rendered.</param>
+            /// <param dataName="index">The index of the current element within the reorderable list, used for contextual rendering.</param>
             /// <returns>The vertical position where drawing completed, used to calculate further layout positioning.</returns>
             private float DrawElementHeaderLine(Rect areaRect, float availableWidth, float startY, DataObject dataObject, SerializedProperty element, int index)
             {
@@ -270,7 +270,7 @@ namespace ScriptableAsset.Editor
                   string usageFoldoutLabel = "";
                   float usageFoldoutActualWidth = 0f;
                   List<UsageInfo> usages = null;
-                  bool hasUsages = _detailedDataUsages != null && _detailedDataUsages.TryGetValue(dataObject.name, out usages) && usages.Count > 0;
+                  bool hasUsages = _detailedDataUsages != null && _detailedDataUsages.TryGetValue(dataObject.dataName, out usages) && usages.Count > 0;
 
                   // If there are usages, prepare the foldout label and calculate its width
                   if (hasUsages)
@@ -281,18 +281,18 @@ namespace ScriptableAsset.Editor
                                     ElementUsageFoldoutMinWidth);
                   }
 
-                  // Draw the name label
+                  // Draw the dataName label
                   var typeNameContent = new GUIContent(dataObject.GetType().Name);
 
-                  // Calculate the width for the type name label, including padding
+                  // Calculate the width for the type dataName label, including padding
                   float typeNameDisplayWidth = EditorStyles.miniLabel.CalcSize(typeNameContent).x + _elementTypeLabelStyle.padding.horizontal + ElementTypePadding;
                   float nameFieldWidth = availableWidth - nameLabelRect.width - usageFoldoutActualWidth - typeNameDisplayWidth - ElementTypePadding;
                   nameFieldWidth = Mathf.Max(nameFieldWidth, ElementMinNameFieldWidth);
 
-                  // Draw the name field, allowing for editing and validation
-                  SerializedProperty nameProperty = element.FindPropertyRelative("name");
+                  // Draw the dataName field, allowing for editing and validation
+                  SerializedProperty nameProperty = element.FindPropertyRelative("dataName");
 
-                  // Check if the name property exists and is valid
+                  // Check if the dataName property exists and is valid
                   if (nameProperty != null)
                   {
                         EditorGUI.BeginChangeCheck();
@@ -305,7 +305,7 @@ namespace ScriptableAsset.Editor
                   }
                   else
                   {
-                        EditorGUI.LabelField(new Rect(currentX, lineRect.y, nameFieldWidth, lineRect.height), dataObject.name);
+                        EditorGUI.LabelField(new Rect(currentX, lineRect.y, nameFieldWidth, lineRect.height), dataObject.dataName);
                   }
 
                   currentX += nameFieldWidth;
@@ -323,7 +323,7 @@ namespace ScriptableAsset.Editor
                         currentX += usageFoldoutActualWidth;
                   }
 
-                  // Draw the type name label with padding
+                  // Draw the type dataName label with padding
                   EditorGUI.LabelField(new Rect(currentX + ElementTypePadding, lineRect.y, typeNameDisplayWidth, lineRect.height),
                               typeNameContent,
                               _elementTypeLabelStyle);
@@ -334,18 +334,18 @@ namespace ScriptableAsset.Editor
             /// <summary>
             /// Draws detailed usage information for a specific data object within a specified area.
             /// </summary>
-            /// <param name="areaRect">The rectangular area in which the usage details will be rendered.</param>
-            /// <param name="availableWidth">The total width available for rendering content.</param>
-            /// <param name="startY">The starting Y position within the provided areaRect.</param>
-            /// <param name="dataObject">The data object for which usage details will be displayed.</param>
-            /// <param name="index">The index of the current element being processed in the reorderable list.</param>
+            /// <param dataName="areaRect">The rectangular area in which the usage details will be rendered.</param>
+            /// <param dataName="availableWidth">The total width available for rendering content.</param>
+            /// <param dataName="startY">The starting Y position within the provided areaRect.</param>
+            /// <param dataName="dataObject">The data object for which usage details will be displayed.</param>
+            /// <param dataName="index">The index of the current element being processed in the reorderable list.</param>
             /// <returns>The updated Y position after rendering the detailed usage information.</returns>
             private float DrawElementUsageDetails(Rect areaRect, float availableWidth, float startY, DataObject dataObject, int index)
             {
                   float currentY = startY;
 
                   // Check if the data object is null or has no usages
-                  if (!_detailedDataUsages.TryGetValue(dataObject.name, out List<UsageInfo> usages) || usages.Count <= 0 ||
+                  if (!_detailedDataUsages.TryGetValue(dataObject.dataName, out List<UsageInfo> usages) || usages.Count <= 0 ||
                       !_foldoutUsageStates.TryGetValue(index, out bool isExpanded) || !isExpanded)
                   {
                         return currentY;
@@ -383,26 +383,26 @@ namespace ScriptableAsset.Editor
             }
 
             /// <summary>
-            /// Draws an error message in the provided area if the element at the given index has a duplicate name.
+            /// Draws an error message in the provided area if the element at the given index has a duplicate dataName.
             /// </summary>
-            /// <param name="areaRect">The rectangle area in which the error message will be displayed.</param>
-            /// <param name="availableWidth">The width available for drawing the error message.</param>
-            /// <param name="startY">The starting Y position within the area rectangle for drawing the error message.</param>
-            /// <param name="index">The index of the element being validated.</param>
+            /// <param dataName="areaRect">The rectangle area in which the error message will be displayed.</param>
+            /// <param dataName="availableWidth">The width available for drawing the error message.</param>
+            /// <param dataName="startY">The starting Y position within the area rectangle for drawing the error message.</param>
+            /// <param dataName="index">The index of the element being validated.</param>
             /// <returns>The updated Y position after drawing the error message, including padding.</returns>
             private float DrawElementNameError(Rect areaRect, float availableWidth, float startY, int index)
             {
                   float currentY = startY;
 
-                  // Check if the index is valid and if the name is a duplicate
+                  // Check if the index is valid and if the dataName is a duplicate
                   if (!_isNameDuplicate.TryGetValue(index, out bool isDuplicate) || !isDuplicate)
                   {
                         return currentY;
                   }
 
-                  // Draw the error message if the name is a duplicate
+                  // Draw the error message if the dataName is a duplicate
                   var errorRect = new Rect(areaRect.x, currentY, availableWidth, EditorGUIUtility.singleLineHeight);
-                  EditorGUI.LabelField(errorRect, "This name is already in use.", _errorLabelStyle);
+                  EditorGUI.LabelField(errorRect, "This dataName is already in use.", _errorLabelStyle);
                   currentY += errorRect.height + EditorGUIUtility.standardVerticalSpacing;
 
                   return currentY;
@@ -413,14 +413,14 @@ namespace ScriptableAsset.Editor
             /// </summary>
             /// <remarks>
             /// This method iterates through all visible child properties of the given serialized element and draws each one,
-            /// skipping the "name" property and handling special cases for properties with a ".value" suffix in their paths.
+            /// skipping the "dataName" property and handling special cases for properties with a ".value" suffix in their paths.
             /// It calculates and adjusts the Y-coordinate incrementally to lay out properties vertically within
             /// the specified area alongside proper spacing between elements.
             /// </remarks>
-            /// <param name="areaRect">The rectangular area within which the properties are rendered.</param>
-            /// <param name="availableWidth">The maximum width available for rendering each property's UI.</param>
-            /// <param name="startY">The initial Y-coordinate from which property rendering begins.</param>
-            /// <param name="element">The serialized property representing the parent container of the properties to draw.</param>
+            /// <param dataName="areaRect">The rectangular area within which the properties are rendered.</param>
+            /// <param dataName="availableWidth">The maximum width available for rendering each property's UI.</param>
+            /// <param dataName="startY">The initial Y-coordinate from which property rendering begins.</param>
+            /// <param dataName="element">The serialized property representing the parent container of the properties to draw.</param>
             private static void DrawElementProperties(Rect areaRect, float availableWidth, float startY, SerializedProperty element)
             {
                   float currentY = startY;
@@ -438,8 +438,8 @@ namespace ScriptableAsset.Editor
                               break;
                         }
 
-                        // Skip the "name" property as it is handled separately
-                        if (currentProp.name == "name")
+                        // Skip the "dataName" property as it is handled separately
+                        if (currentProp.name == "dataName")
                         {
                               continue;
                         }
@@ -474,7 +474,7 @@ namespace ScriptableAsset.Editor
             /// padding, spacing, and error messages associated with the specific data object.
             /// It ensures sufficient vertical space is provided for a clear and consistent display of data.
             /// </remarks>
-            /// <param name="index">The index of the element in the list for which the height is being calculated.</param>
+            /// <param dataName="index">The index of the element in the list for which the height is being calculated.</param>
             /// <returns>The calculated height as a <see cref="float"/> value representing the vertical space required for the element.</returns>
             private float CalculateElementHeight(int index)
             {
@@ -492,7 +492,7 @@ namespace ScriptableAsset.Editor
                   height += 4;
                   height += EditorGUIUtility.standardVerticalSpacing * 2;
 
-                  height += CalculateUsageDetailsHeight(index, dataObject?.name);
+                  height += CalculateUsageDetailsHeight(index, dataObject?.dataName);
                   height += CalculateNameErrorHeight(index);
                   height += SmallVerticalSpacing;
                   height += CalculatePropertiesHeight(element);
@@ -503,11 +503,11 @@ namespace ScriptableAsset.Editor
             /// <summary>
             /// Calculates the height required to display the usage details for a specific data object in the reorderable list.
             /// </summary>
-            /// <param name="index">The index of the data element in the reorderable list.</param>
-            /// <param name="dataObjectName">The name of the data object for which usage details are calculated.</param>
+            /// <param dataName="index">The index of the data element in the reorderable list.</param>
+            /// <param dataName="dataObjectName">The dataName of the data object for which usage details are calculated.</param>
             /// <returns>
             /// The calculated height required to display the usage details, including individual lines for data usage and spacing.
-            /// Returns 0 if the data object name is null, empty, or there are no usage details associated with it.
+            /// Returns 0 if the data object dataName is null, empty, or there are no usage details associated with it.
             /// </returns>
             private float CalculateUsageDetailsHeight(int index, string dataObjectName)
             {
@@ -518,7 +518,7 @@ namespace ScriptableAsset.Editor
                         return 0;
                   }
 
-                  // Check if there are usages for the given data object name and if the foldout is expanded
+                  // Check if there are usages for the given data object dataName and if the foldout is expanded
                   if (!_detailedDataUsages.TryGetValue(dataObjectName, out List<UsageInfo> usages) || usages.Count <= 0 ||
                       !_foldoutUsageStates.TryGetValue(index, out bool isExpanded) || !isExpanded)
                   {
@@ -532,13 +532,13 @@ namespace ScriptableAsset.Editor
             }
 
             /// <summary>
-            /// Calculates the height required to display a name duplication error message for a specific element in the reorderable list.
+            /// Calculates the height required to display a dataName duplication error message for a specific element in the reorderable list.
             /// </summary>
-            /// <param name="index">The index of the element in the reorderable list being checked for name duplication.</param>
-            /// <returns>The height needed to display the error message if a name duplication exists for the specified element; otherwise, returns 0.</returns>
+            /// <param dataName="index">The index of the element in the reorderable list being checked for dataName duplication.</param>
+            /// <returns>The height needed to display the error message if a dataName duplication exists for the specified element; otherwise, returns 0.</returns>
             private float CalculateNameErrorHeight(int index)
             {
-                  // Check if the index is valid and if the name is a duplicate
+                  // Check if the index is valid and if the dataName is a duplicate
                   if (_isNameDuplicate.TryGetValue(index, out bool isDuplicate) && isDuplicate)
                   {
                         return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
@@ -550,7 +550,7 @@ namespace ScriptableAsset.Editor
             /// <summary>
             /// Calculates the total height required to render all visible properties of the given serialized element.
             /// </summary>
-            /// <param name="element">The serialized property representing the element whose properties' height needs to be calculated.</param>
+            /// <param dataName="element">The serialized property representing the element whose properties' height needs to be calculated.</param>
             /// <returns>The total height in pixels required to display all the visible sub-properties of the provided serialized element.</returns>
             private static float CalculatePropertiesHeight(SerializedProperty element)
             {
@@ -569,8 +569,8 @@ namespace ScriptableAsset.Editor
                               break;
                         }
 
-                        // Skip the "name" property as it is handled separately
-                        if (currentProp.name == "name")
+                        // Skip the "dataName" property as it is handled separately
+                        if (currentProp.name == "dataName")
                         {
                               continue;
                         }
@@ -585,7 +585,7 @@ namespace ScriptableAsset.Editor
             /// <summary>
             /// Handles the removal of an element from the reorderable list and updates the serialized property and associated states accordingly.
             /// </summary>
-            /// <param name="l">The <see cref="ReorderableList"/> instance triggering the removal operation.</param>
+            /// <param dataName="l">The <see cref="ReorderableList"/> instance triggering the removal operation.</param>
             /// <remarks>
             /// This method ensures the proper cleanup of managed reference values and internal usage states when an element is removed.
             /// After updating the serialized array, it validates all names, updates the editor's target asset state, and applies the changes to the serialized object.
@@ -645,7 +645,7 @@ namespace ScriptableAsset.Editor
                         string json = JsonUtility.ToJson(sourceDataObject);
                         JsonUtility.FromJsonOverwrite(json, newInstance);
 
-                        string baseName = string.IsNullOrEmpty(sourceDataObject.name) ? "New" + newInstance.GetType().Name : sourceDataObject.name;
+                        string baseName = string.IsNullOrEmpty(sourceDataObject.dataName) ? "New" + newInstance.GetType().Name : sourceDataObject.dataName;
 
                         if (!baseName.EndsWith("_Copy", StringComparison.OrdinalIgnoreCase))
                         {
@@ -665,18 +665,18 @@ namespace ScriptableAsset.Editor
 
                               if (_allDataProperty.GetArrayElementAtIndex(i).managedReferenceValue is DataObject item)
                               {
-                                    existingNames.Add(item.name);
+                                    existingNames.Add(item.dataName);
                               }
                         }
 
-                        existingNames.Add(sourceDataObject.name);
+                        existingNames.Add(sourceDataObject.dataName);
 
                         while (existingNames.Contains(potentialName))
                         {
                               potentialName = $"{baseName}{counter++}";
                         }
 
-                        newInstance.name = potentialName;
+                        newInstance.dataName = potentialName;
                   }
                   catch (Exception ex)
                   {
