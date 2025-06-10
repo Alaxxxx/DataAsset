@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using ScriptableAsset.Core.Attributes;
+using DataAsset.Core.Attributes;
 using UnityEditor;
 using UnityEngine;
 
@@ -22,7 +22,7 @@ namespace ScriptableAsset.Editor
                         return;
                   }
 
-                  var soAsset = property.objectReferenceValue as Core.DataAsset;
+                  var soAsset = property.objectReferenceValue as DataAsset.Core.DataAsset;
                   string message = null;
                   var messageType = MessageType.None;
 
@@ -39,7 +39,7 @@ namespace ScriptableAsset.Editor
                   }
                   else
                   {
-                        message = $"Assigned object is not a '{nameof(Core.DataAsset)}'. Expected type: {typeof(Core.DataAsset).FullName}";
+                        message = $"Assigned object is not a '{nameof(DataAsset.Core.DataAsset)}'. Expected type: {typeof(DataAsset.Core.DataAsset).FullName}";
                         messageType = MessageType.Error;
                   }
 
@@ -59,7 +59,7 @@ namespace ScriptableAsset.Editor
                   {
                         string messageContentForHeight = null;
 
-                        if (property.objectReferenceValue is Core.DataAsset soAsset)
+                        if (property.objectReferenceValue is DataAsset.Core.DataAsset soAsset)
                         {
                               var keysAttribute = (RequireDataKeysAttribute)this.attribute;
                               List<string> missingKeys = GetMissingKeys(soAsset, keysAttribute.RequiredKeys);
@@ -71,7 +71,7 @@ namespace ScriptableAsset.Editor
                         }
                         else
                         {
-                              messageContentForHeight = $"Assigned object is not a '{nameof(Core.DataAsset)}'.";
+                              messageContentForHeight = $"Assigned object is not a '{nameof(DataAsset.Core.DataAsset)}'.";
                         }
 
                         if (messageContentForHeight != null)
@@ -83,7 +83,7 @@ namespace ScriptableAsset.Editor
                   return height;
             }
 
-            private static List<string> GetMissingKeys(Core.DataAsset asset, string[] requiredKeys)
+            private static List<string> GetMissingKeys(DataAsset.Core.DataAsset asset, string[] requiredKeys)
             {
                   var missingKeys = new List<string>();
 

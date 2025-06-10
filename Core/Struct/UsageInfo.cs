@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ScriptableAsset.Core.Struct
+namespace DataAsset.Core.Struct
 {
       [Serializable]
       public struct UsageInfo : IEquatable<UsageInfo>

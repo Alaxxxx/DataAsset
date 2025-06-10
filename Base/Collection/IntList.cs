@@ -1,7 +1,7 @@
 ﻿using System;
-using ScriptableAsset.Core;
+using DataAsset.Core;
 
-namespace ScriptableAsset.Base.Collection
+namespace DataAsset.Base.Collection
 {
       [Serializable]
       public class IntList : ReactiveList<int>

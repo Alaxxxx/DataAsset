@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace ScriptableAsset.Core.Attributes
+namespace DataAsset.Core.Attributes
 {
       [AttributeUsage(AttributeTargets.Field)]
       public sealed class RequireDataKeysAttribute : PropertyAttribute

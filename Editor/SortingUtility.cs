@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using ScriptableAsset.Core;
+using DataAsset.Core;
 using UnityEditor;
 
 namespace ScriptableAsset.Editor

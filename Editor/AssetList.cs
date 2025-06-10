@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using ScriptableAsset.Core;
-using ScriptableAsset.Core.Struct;
+using DataAsset.Core;
+using DataAsset.Core.Struct;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;

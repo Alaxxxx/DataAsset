@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ScriptableAsset.Core
+namespace DataAsset.Core
 {
       [Serializable]
       public abstract class DataObject
@@ -8,9 +8,9 @@ namespace ScriptableAsset.Core
             // The name of the data object, used for identification
             public string dataName;
 
-            // Event triggered when the value of the data object changes
+            // Internal event triggered on the data asset when the value of the data object changes
             [field: NonSerialized]
-            public event Action<DataObject> OnDataChanged;
+            protected internal event Action<DataObject> OnDataChanged;
 
 #region Constructors
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ScriptableAsset.Core
+namespace DataAsset.Core
 {
       [Serializable]
       public abstract class ReactiveValue<T> : DataObject

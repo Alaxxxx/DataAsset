@@ -1,6 +1,6 @@
-﻿using ScriptableAsset.Core;
+﻿using DataAsset.Core;
 
-namespace ScriptableAsset.Base.Primitive
+namespace DataAsset.Base.Primitive
 {
       public class ReactiveShort : ReactiveValue<short>
       {

@@ -4,23 +4,21 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace ScriptableAsset.Core
+namespace DataAsset.Core
 {
-      /// <summary>
-      /// Represents a reactive list that notifies subscribers about changes in its content such as additions, removals, and updates.
-      /// </summary>
-      /// <typeparam dataName="TItem">The type of the elements in the list.</typeparam>
       [Serializable]
       public abstract class ReactiveList<TItem> : DataObject, IList<TItem>, IReadOnlyList<TItem>
       {
-            [SerializeField]
-            private List<TItem> items = new();
+            [SerializeField] private List<TItem> items = new();
 
+            // Events to notify changes in the list
             [field: NonSerialized] public event Action OnCollectionChanged;
             [field: NonSerialized] public event Action<TItem, int> OnItemAdded;
             [field: NonSerialized] public event Action<TItem, int> OnItemRemoved;
             [field: NonSerialized] public event Action<TItem, TItem, int> OnItemSet;
             [field: NonSerialized] public event Action OnListCleared;
+
+#region Constructors
 
             protected ReactiveList() : base("New List")
             {
@@ -35,6 +33,10 @@ namespace ScriptableAsset.Core
             {
                   items = new List<TItem>(initialItems);
             }
+
+#endregion
+
+#region Methods
 
             public TItem this[int index]
             {
@@ -56,11 +58,9 @@ namespace ScriptableAsset.Core
                         items[index] = value;
                         OnItemSet?.Invoke(oldItem, value, index);
                         OnCollectionChanged?.Invoke();
+                        TriggerChange();
                   }
             }
-
-            public int Count => items.Count;
-            public bool IsReadOnly => ((ICollection<TItem>)items).IsReadOnly;
 
             public void Add(TItem item)
             {
@@ -68,6 +68,7 @@ namespace ScriptableAsset.Core
                   items.Add(item);
                   OnItemAdded?.Invoke(item, newIndex);
                   OnCollectionChanged?.Invoke();
+                  TriggerChange();
             }
 
             public void AddRange(IEnumerable<TItem> collection)
@@ -87,6 +88,7 @@ namespace ScriptableAsset.Core
                   items.AddRange(itemsToAdd);
 
                   OnCollectionChanged?.Invoke();
+                  TriggerChange();
             }
 
             public void Clear()
@@ -99,19 +101,16 @@ namespace ScriptableAsset.Core
                   items.Clear();
                   OnListCleared?.Invoke();
                   OnCollectionChanged?.Invoke();
+                  TriggerChange();
             }
 
-            public bool Contains(TItem item) => items.Contains(item);
-
-            public void CopyTo(TItem[] array, int arrayIndex) => items.CopyTo(array, arrayIndex);
-
-            public int IndexOf(TItem item) => items.IndexOf(item);
 
             public void Insert(int index, TItem item)
             {
                   items.Insert(index, item);
                   OnItemAdded?.Invoke(item, index);
                   OnCollectionChanged?.Invoke();
+                  TriggerChange();
             }
 
             public bool Remove(TItem item)
@@ -123,15 +122,9 @@ namespace ScriptableAsset.Core
                         return false;
                   }
 
-                  bool removed = items.Remove(item);
+                  RemoveAt(index);
 
-                  if (removed)
-                  {
-                        OnItemRemoved?.Invoke(item, index);
-                        OnCollectionChanged?.Invoke();
-                  }
-
-                  return removed;
+                  return true;
             }
 
             public void RemoveAt(int index)
@@ -145,19 +138,31 @@ namespace ScriptableAsset.Core
                   items.RemoveAt(index);
                   OnItemRemoved?.Invoke(removedItem, index);
                   OnCollectionChanged?.Invoke();
+                  TriggerChange();
             }
 
-            public IEnumerator<TItem> GetEnumerator() => items.GetEnumerator();
-
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
+#endregion
 
             public List<TItem> GetRawListCopy() => new(items);
 
             public void NotifyListChangedExternally()
             {
                   OnCollectionChanged?.Invoke();
+                  TriggerChange();
             }
+
+            public IEnumerator<TItem> GetEnumerator() => items.GetEnumerator();
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+            public int Count => items.Count;
+            public bool IsReadOnly => ((ICollection<TItem>)items).IsReadOnly;
+
+            public bool Contains(TItem item) => items.Contains(item);
+
+            public void CopyTo(TItem[] array, int arrayIndex) => items.CopyTo(array, arrayIndex);
+
+            public int IndexOf(TItem item) => items.IndexOf(item);
 
             public override string ToString() => $"ReactiveList<{typeof(TItem).Name}> (Count = {Count})";
       }

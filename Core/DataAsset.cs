@@ -4,7 +4,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using UnityEngine;
 
-namespace ScriptableAsset.Core
+namespace DataAsset.Core
 {
       [CreateAssetMenu(fileName = "NewDataAsset", menuName = "ScriptableObjects/DataAsset", order = 1)]
       public sealed class DataAsset : ScriptableObject
@@ -34,15 +34,14 @@ namespace ScriptableAsset.Core
 
                   foreach (DataObject data in dataList.Where(static data => data != null && !string.IsNullOrEmpty(data.dataName)))
                   {
-                        if (!_dataMap.TryAdd(data.dataName, data))
+                        if (_dataMap.TryAdd(data.dataName, data))
+                        {
+                              data.OnDataChanged += HandleContainedDataChanged;
+                        }
+                        else
                         {
                               Debug.LogWarning($"[DataAsset: {this.name}] Duplicate data name '{data.dataName}' found.", this);
-
-                              continue;
                         }
-
-                        data.OnDataChanged -= HandleContainedDataChanged;
-                        data.OnDataChanged += HandleContainedDataChanged;
                   }
 
                   _isMapInitialized = true;
@@ -69,7 +68,6 @@ namespace ScriptableAsset.Core
 
 #region Getters
 
-            [UsedImplicitly]
             public T GetData<T>(string dataName) where T : DataObject
             {
                   if (!_isMapInitialized)
@@ -118,6 +116,7 @@ namespace ScriptableAsset.Core
                   dataList.Add(data);
                   _dataMap[data.dataName] = data;
                   _isMapInitialized = false;
+                  data.OnDataChanged += HandleContainedDataChanged;
             }
 
 #endregion

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using ScriptableAsset.Core.Struct;
+using DataAsset.Core.Struct;
 using UnityEditor;
 using UnityEngine;
 

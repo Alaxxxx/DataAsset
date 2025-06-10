@@ -1,7 +1,7 @@
 ﻿using System;
-using ScriptableAsset.Core;
+using DataAsset.Core;
 
-namespace ScriptableAsset.Base.Primitive
+namespace DataAsset.Base.Primitive
 {
       [Serializable]
       public class ReactiveBool : ReactiveValue<bool>

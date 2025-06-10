@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEditor;
 
-namespace ScriptableAsset.Core.Struct
+namespace DataAsset.Core.Struct
 {
       public struct ScriptContext : IEquatable<ScriptContext>
       {

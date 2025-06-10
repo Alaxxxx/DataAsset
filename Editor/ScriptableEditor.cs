@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ScriptableAsset.Core.Struct;
+using DataAsset.Core.Struct;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEditorInternal;
@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace ScriptableAsset.Editor
 {
-      [CustomEditor(typeof(Core.DataAsset))]
+      [CustomEditor(typeof(DataAsset.Core.DataAsset))]
       public sealed partial class ScriptableEditor : UnityEditor.Editor
       {
             // Constants for layout and styles
@@ -35,7 +35,7 @@ namespace ScriptableAsset.Editor
             private const float SmallVerticalSpacing = 2f;
 
             // The target asset being edited
-            private Core.DataAsset _targetAsset;
+            private DataAsset.Core.DataAsset _targetAsset;
 
             // Serialized property for the list of data objects
             private SerializedProperty _allDataProperty;
@@ -90,7 +90,7 @@ namespace ScriptableAsset.Editor
             private void OnEnable()
             {
                   // Initialize the target asset and serialized properties
-                  _targetAsset = (Core.DataAsset)target;
+                  _targetAsset = (DataAsset.Core.DataAsset)target;
 
                   if (!_targetAsset)
                   {
