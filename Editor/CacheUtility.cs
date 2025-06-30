@@ -4,8 +4,9 @@ using System.IO;
 using DataAsset.Core.Struct;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
-namespace ScriptableAsset.Editor
+namespace DataAsset.Editor
 {
       [Serializable]
       public class UsageCacheData
@@ -24,16 +25,16 @@ namespace ScriptableAsset.Editor
       {
             private string GetUsageCacheFilePath()
             {
-                  if (!_targetAsset)
+                  if (!_targetAssetSo)
                   {
                         return null;
                   }
 
-                  string assetPath = AssetDatabase.GetAssetPath(_targetAsset);
+                  string assetPath = AssetDatabase.GetAssetPath((Object)_targetAssetSo);
 
                   if (string.IsNullOrEmpty(assetPath))
                   {
-                        Debug.LogWarning($"[ScriptableEditor_Cache] Asset '{_targetAsset.name}' does not have a persistent path.", _targetAsset);
+                        Debug.LogWarning($"[ScriptableEditor_Cache] Asset '{_targetAssetSo.name}' does not have a persistent path.", _targetAssetSo);
 
                         return null;
                   }
@@ -42,12 +43,12 @@ namespace ScriptableAsset.Editor
 
                   if (string.IsNullOrEmpty(assetGuid))
                   {
-                        Debug.LogWarning($"[ScriptableEditor_Cache] Could not get GUID for asset '{_targetAsset.name}' at path '{assetPath}'. ", _targetAsset);
+                        Debug.LogWarning($"[ScriptableEditor_Cache] Could not get GUID for assetSo '{_targetAssetSo.name}' at path '{assetPath}'. ", _targetAssetSo);
 
                         return null;
                   }
 
-                  string cacheDirectory = Path.Combine("Library", UsageCacheFolderName);
+                  string cacheDirectory = Path.Combine("Library", ScriptableEditor.UsageCacheFolderName);
 
                   if (!Directory.Exists(cacheDirectory))
                   {
@@ -74,14 +75,14 @@ namespace ScriptableAsset.Editor
 
                   if (filePath == null)
                   {
-                        Debug.LogWarning($"[ScriptableEditor_Cache] Cannot save cache for '{_targetAsset.name}', file path is invalid.");
+                        Debug.LogWarning($"[ScriptableEditor_Cache] Cannot save cache for '{_targetAssetSo.name}', file path is invalid.");
 
                         return;
                   }
 
                   if (_detailedDataUsages == null)
                   {
-                        Debug.LogWarning($"[ScriptableEditor_Cache] _detailedDataUsages is null for '{_targetAsset.name}'. Nothing to save.");
+                        Debug.LogWarning($"[ScriptableEditor_Cache] _detailedDataUsages is null for '{_targetAssetSo.name}'. Nothing to save.");
 
                         return;
                   }
@@ -100,7 +101,7 @@ namespace ScriptableAsset.Editor
                   }
                   catch (Exception ex)
                   {
-                        Debug.LogError($"[ScriptableEditor_Cache] Failed to save usage cache for '{_targetAsset.name}': {ex.Message}");
+                        Debug.LogError($"[ScriptableEditor_Cache] Failed to save usage cache for '{_targetAssetSo.name}': {ex.Message}");
                   }
             }
 
@@ -113,7 +114,7 @@ namespace ScriptableAsset.Editor
 
                   if (filePath == null)
                   {
-                        Debug.LogWarning($"[ScriptableEditor_Cache] Cannot load cache for '{_targetAsset.name}', file path is invalid.");
+                        Debug.LogWarning($"[ScriptableEditor_Cache] Cannot load cache for '{_targetAssetSo.name}', file path is invalid.");
                         Repaint();
 
                         return;
@@ -132,7 +133,7 @@ namespace ScriptableAsset.Editor
 
                         if (string.IsNullOrWhiteSpace(json))
                         {
-                              Debug.LogWarning($"[ScriptableEditor_Cache] Cache file for '{_targetAsset.name}' is empty. Path: {filePath}");
+                              Debug.LogWarning($"[ScriptableEditor_Cache] Cache file for '{_targetAssetSo.name}' is empty. Path: {filePath}");
                               Repaint();
 
                               return;
@@ -149,12 +150,12 @@ namespace ScriptableAsset.Editor
                         }
                         else
                         {
-                              Debug.LogWarning($"[ScriptableEditor_Cache] Failed to deserialize cache or cache was empty for '{_targetAsset.name}'. Path: {filePath}");
+                              Debug.LogWarning($"[ScriptableEditor_Cache] Failed to deserialize cache or cache was empty for '{_targetAssetSo.name}'. Path: {filePath}");
                         }
                   }
                   catch (Exception ex)
                   {
-                        Debug.LogError($"[ScriptableEditor_Cache] Failed to load cache for '{_targetAsset.name}': {ex.Message}. Path: {filePath}");
+                        Debug.LogError($"[ScriptableEditor_Cache] Failed to load cache for '{_targetAssetSo.name}': {ex.Message}. Path: {filePath}");
 
                         try
                         {
@@ -162,7 +163,7 @@ namespace ScriptableAsset.Editor
                         }
                         catch
                         {
-                              Debug.LogError($"[ScriptableEditor_Cache] Failed to delete corrupted cache file for '{_targetAsset.name}'. Path: {filePath}");
+                              Debug.LogError($"[ScriptableEditor_Cache] Failed to delete corrupted cache file for '{_targetAssetSo.name}'. Path: {filePath}");
                         }
                   }
 

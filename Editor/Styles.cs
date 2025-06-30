@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace ScriptableAsset.Editor
+namespace DataAsset.Editor
 {
       public sealed partial class ScriptableEditor
       {

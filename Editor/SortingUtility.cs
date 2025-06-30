@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using DataAsset.Core;
 using UnityEditor;
 
-namespace ScriptableAsset.Editor
+namespace DataAsset.Editor
 {
       public sealed partial class ScriptableEditor
       {
             /// <summary>
-            /// Specifies the modes available for sorting data objects within a <see cref="ScriptableEditor"/>.
+            /// Specifies the modes available for sorting data objects within a <see cref="DataAsset.Editor.ScriptableEditor"/>.
             /// </summary>
             private enum SortMode
             {
@@ -30,7 +30,7 @@ namespace ScriptableAsset.Editor
                         return;
                   }
 
-                  Undo.RecordObject(_targetAsset, "Sort Data Objects");
+                  Undo.RecordObject(_targetAssetSo, "Sort Data Objects");
 
                   var tempList = new List<DataObject>(_allDataProperty.arraySize);
 
@@ -65,7 +65,7 @@ namespace ScriptableAsset.Editor
                   }
 
                   ValidateAllNames();
-                  EditorUtility.SetDirty(_targetAsset);
+                  EditorUtility.SetDirty(_targetAssetSo);
                   serializedObject.ApplyModifiedProperties();
                   serializedObject.Update();
             }

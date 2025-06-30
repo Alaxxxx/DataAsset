@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace ScriptableAsset.Editor
+namespace DataAsset.Editor
 {
       public partial class ScriptableEditor
       {
@@ -37,7 +37,7 @@ namespace ScriptableAsset.Editor
 
                   GUILayout.Space(ElementColorBarWidth + 4);
 
-                  string headerTitle = $"{_targetAsset.name}: {dataObject.dataName} ({dataObject.GetType().Name})";
+                  string headerTitle = $"{_targetAssetSo.name}: {dataObject.dataName} ({dataObject.GetType().Name})";
                   GUILayout.Label(new GUIContent(headerTitle, "Currently editing this single data object."), EditorStyles.boldLabel);
                   GUILayout.FlexibleSpace();
 

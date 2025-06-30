@@ -7,7 +7,7 @@ using UnityEditorInternal;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace ScriptableAsset.Editor
+namespace DataAsset.Editor
 {
       public sealed partial class ScriptableEditor
       {
@@ -67,18 +67,18 @@ namespace ScriptableAsset.Editor
                   // Calculate the width of the title label and adjust the current X position accordingly
                   float titleWidth = EditorStyles.label.CalcSize(titleContent).x;
                   EditorGUI.LabelField(new Rect(currentX, rect.y, titleWidth, EditorGUIUtility.singleLineHeight), titleContent);
-                  currentX += titleWidth + HeaderSpacing * 2;
+                  currentX += titleWidth + ScriptableEditor.HeaderSpacing * 2;
 
                   // The total width of the scan button and its margin
-                  const float scanButtonTotalWidth = HeaderScanButtonWidth + HeaderRightMargin;
-                  float searchAndSortMaxWidth = rect.width - currentX - scanButtonTotalWidth - HeaderSpacing;
+                  const float scanButtonTotalWidth = ScriptableEditor.HeaderScanButtonWidth + ScriptableEditor.HeaderRightMargin;
+                  float searchAndSortMaxWidth = rect.width - currentX - scanButtonTotalWidth - ScriptableEditor.HeaderSpacing;
 
                   // Draw search and sort controls, ensuring they fit within the available width
                   DrawSearchAndSortControls(new Rect(currentX, rect.y, searchAndSortMaxWidth, EditorGUIUtility.singleLineHeight));
 
-                  var scanButtonRect = new Rect(rect.x + rect.width - HeaderScanButtonWidth - HeaderRightMargin,
+                  var scanButtonRect = new Rect(rect.x + rect.width - ScriptableEditor.HeaderScanButtonWidth - ScriptableEditor.HeaderRightMargin,
                               rect.y,
-                              HeaderScanButtonWidth,
+                              ScriptableEditor.HeaderScanButtonWidth,
                               EditorGUIUtility.singleLineHeight);
                   DrawScanButton(scanButtonRect);
             }
@@ -99,34 +99,34 @@ namespace ScriptableAsset.Editor
                   float currentX = rect.x;
 
                   // Draw the search field with a maximum width based on the header's width
-                  float searchFieldWidth = Mathf.Max(rect.width * HeaderSearchFieldMaxWidthPercentage, HeaderSearchFieldMinWidth);
+                  float searchFieldWidth = Mathf.Max(rect.width * ScriptableEditor.HeaderSearchFieldMaxWidthPercentage, ScriptableEditor.HeaderSearchFieldMinWidth);
 
                   // Ensure the search field does not exceed the available width
                   _searchText = EditorGUI.TextField(new Rect(currentX, rect.y, searchFieldWidth, EditorGUIUtility.singleLineHeight),
                               _searchText,
                               EditorStyles.toolbarSearchField);
-                  currentX += searchFieldWidth + HeaderSpacing;
+                  currentX += searchFieldWidth + ScriptableEditor.HeaderSpacing;
 
                   // Draw the sorting buttons
-                  if (GUI.Button(new Rect(currentX, rect.y, HeaderSortButtonWidth, EditorGUIUtility.singleLineHeight), "Name ▼", EditorStyles.toolbarButton))
+                  if (GUI.Button(new Rect(currentX, rect.y, ScriptableEditor.HeaderSortButtonWidth, EditorGUIUtility.singleLineHeight), "Name ▼", EditorStyles.toolbarButton))
                   {
-                        ApplySort(SortMode.ByNameAsc);
+                        ApplySort(ScriptableEditor.SortMode.ByNameAsc);
                   }
 
-                  currentX += HeaderSortButtonWidth;
+                  currentX += ScriptableEditor.HeaderSortButtonWidth;
 
                   // Draw the sort button for descending dataName order
-                  if (GUI.Button(new Rect(currentX, rect.y, HeaderSortButtonWidth, EditorGUIUtility.singleLineHeight), "Name ▲", EditorStyles.toolbarButton))
+                  if (GUI.Button(new Rect(currentX, rect.y, ScriptableEditor.HeaderSortButtonWidth, EditorGUIUtility.singleLineHeight), "Name ▲", EditorStyles.toolbarButton))
                   {
-                        ApplySort(SortMode.ByNameDesc);
+                        ApplySort(ScriptableEditor.SortMode.ByNameDesc);
                   }
 
-                  currentX += HeaderSortButtonWidth;
+                  currentX += ScriptableEditor.HeaderSortButtonWidth;
 
                   // Draw the sort button for sorting by type
-                  if (GUI.Button(new Rect(currentX, rect.y, HeaderSortButtonWidth, EditorGUIUtility.singleLineHeight), "Type", EditorStyles.toolbarButton))
+                  if (GUI.Button(new Rect(currentX, rect.y, ScriptableEditor.HeaderSortButtonWidth, EditorGUIUtility.singleLineHeight), "Type", EditorStyles.toolbarButton))
                   {
-                        ApplySort(SortMode.ByType);
+                        ApplySort(ScriptableEditor.SortMode.ByType);
                   }
             }
 
@@ -203,9 +203,9 @@ namespace ScriptableAsset.Editor
 
                   // Draw the drag handle for the element
                   bool isDimmed = !string.IsNullOrEmpty(_searchText) &&
-                                  !dataObject.dataName.ToLowerInvariant().Contains(_searchText.ToLowerInvariant(), StringComparison.Ordinal);
+                                  !dataObject.dataName.ToLowerInvariant().Contains((string)_searchText.ToLowerInvariant(), StringComparison.Ordinal);
 
-                  var elementBackgroundRect = new Rect(rect.x + ElementDragHandleWidth, rect.y + 1, rect.width - ElementDragHandleWidth - 1, rect.height - 2);
+                  var elementBackgroundRect = new Rect(rect.x + ScriptableEditor.ElementDragHandleWidth, rect.y + 1, rect.width - ScriptableEditor.ElementDragHandleWidth - 1, rect.height - 2);
                   GUI.Box(elementBackgroundRect, GUIContent.none, _blockStyle);
 
                   var contentRect = new Rect(elementBackgroundRect.x + _blockStyle.padding.left,
@@ -219,7 +219,7 @@ namespace ScriptableAsset.Editor
                   }
 
                   // Draw the color bar on the left side of the element
-                  var colorBarRect = new Rect(contentRect.x, contentRect.y, ElementColorBarWidth, contentRect.height);
+                  var colorBarRect = new Rect(contentRect.x, contentRect.y, ScriptableEditor.ElementColorBarWidth, contentRect.height);
 
                   if (_typeColors.TryGetValue(dataObject.GetType(), out Color typeColor))
                   {
@@ -227,9 +227,9 @@ namespace ScriptableAsset.Editor
                   }
 
                   // Draw the content of the element, including header, usage details, and properties
-                  var fieldsRect = new Rect(contentRect.x + ElementColorBarWidth + ElementContentPadding,
+                  var fieldsRect = new Rect(contentRect.x + ScriptableEditor.ElementColorBarWidth + ScriptableEditor.ElementContentPadding,
                               contentRect.y,
-                              contentRect.width - ElementColorBarWidth - ElementContentPadding,
+                              contentRect.width - ScriptableEditor.ElementColorBarWidth - ScriptableEditor.ElementContentPadding,
                               contentRect.height);
 
                   // Draw the header line, usage details, dataName error, and properties for the element
@@ -237,7 +237,7 @@ namespace ScriptableAsset.Editor
                   currentY = DrawElementHeaderLine(fieldsRect, fieldsRect.width, currentY, dataObject, element, index);
                   currentY = DrawElementUsageDetails(fieldsRect, fieldsRect.width, currentY, dataObject, index);
                   currentY = DrawElementNameError(fieldsRect, fieldsRect.width, currentY, index);
-                  currentY += SmallVerticalSpacing;
+                  currentY += ScriptableEditor.SmallVerticalSpacing;
                   DrawElementProperties(fieldsRect, fieldsRect.width, currentY, element);
 
                   if (isDimmed)
@@ -262,7 +262,7 @@ namespace ScriptableAsset.Editor
                   var lineRect = new Rect(areaRect.x, startY, availableWidth, EditorGUIUtility.singleLineHeight);
 
                   // Draw the background for the header line
-                  var nameLabelRect = new Rect(lineRect.x, lineRect.y, ElementNameLabelWidth, lineRect.height);
+                  var nameLabelRect = new Rect(lineRect.x, lineRect.y, ScriptableEditor.ElementNameLabelWidth, lineRect.height);
                   EditorGUI.LabelField(nameLabelRect, "Name:");
                   float currentX = nameLabelRect.xMax;
 
@@ -277,17 +277,17 @@ namespace ScriptableAsset.Editor
                   {
                         usageFoldoutLabel = $" ({usages.Count} refs)";
 
-                        usageFoldoutActualWidth = Mathf.Max(EditorStyles.foldout.CalcSize(new GUIContent(usageFoldoutLabel)).x + ElementTypePadding,
-                                    ElementUsageFoldoutMinWidth);
+                        usageFoldoutActualWidth = Mathf.Max(EditorStyles.foldout.CalcSize(new GUIContent(usageFoldoutLabel)).x + ScriptableEditor.ElementTypePadding,
+                                    ScriptableEditor.ElementUsageFoldoutMinWidth);
                   }
 
                   // Draw the dataName label
                   var typeNameContent = new GUIContent(dataObject.GetType().Name);
 
                   // Calculate the width for the type dataName label, including padding
-                  float typeNameDisplayWidth = EditorStyles.miniLabel.CalcSize(typeNameContent).x + _elementTypeLabelStyle.padding.horizontal + ElementTypePadding;
-                  float nameFieldWidth = availableWidth - nameLabelRect.width - usageFoldoutActualWidth - typeNameDisplayWidth - ElementTypePadding;
-                  nameFieldWidth = Mathf.Max(nameFieldWidth, ElementMinNameFieldWidth);
+                  float typeNameDisplayWidth = EditorStyles.miniLabel.CalcSize(typeNameContent).x + _elementTypeLabelStyle.padding.horizontal + ScriptableEditor.ElementTypePadding;
+                  float nameFieldWidth = availableWidth - nameLabelRect.width - usageFoldoutActualWidth - typeNameDisplayWidth - ScriptableEditor.ElementTypePadding;
+                  nameFieldWidth = Mathf.Max(nameFieldWidth, ScriptableEditor.ElementMinNameFieldWidth);
 
                   // Draw the dataName field, allowing for editing and validation
                   SerializedProperty nameProperty = element.FindPropertyRelative("dataName");
@@ -324,9 +324,9 @@ namespace ScriptableAsset.Editor
                   }
 
                   // Draw the type dataName label with padding
-                  EditorGUI.LabelField(new Rect(currentX + ElementTypePadding, lineRect.y, typeNameDisplayWidth, lineRect.height),
+                  EditorGUI.LabelField(new Rect(currentX + ScriptableEditor.ElementTypePadding, lineRect.y, typeNameDisplayWidth, lineRect.height),
                               typeNameContent,
-                              _elementTypeLabelStyle);
+                              (GUIStyle)_elementTypeLabelStyle);
 
                   return lineRect.yMax + EditorGUIUtility.standardVerticalSpacing;
             }
@@ -402,7 +402,7 @@ namespace ScriptableAsset.Editor
 
                   // Draw the error message if the dataName is a duplicate
                   var errorRect = new Rect(areaRect.x, currentY, availableWidth, EditorGUIUtility.singleLineHeight);
-                  EditorGUI.LabelField(errorRect, "This dataName is already in use.", _errorLabelStyle);
+                  EditorGUI.LabelField(errorRect, (string)"This dataName is already in use.", (GUIStyle)_errorLabelStyle);
                   currentY += errorRect.height + EditorGUIUtility.standardVerticalSpacing;
 
                   return currentY;
@@ -451,7 +451,7 @@ namespace ScriptableAsset.Editor
                         {
                               float originalLabelWidth = EditorGUIUtility.labelWidth;
 
-                              EditorGUIUtility.labelWidth = ElementValueLabelWidth;
+                              EditorGUIUtility.labelWidth = ScriptableEditor.ElementValueLabelWidth;
 
                               EditorGUI.PropertyField(propRect, currentProp, true);
 
@@ -494,7 +494,7 @@ namespace ScriptableAsset.Editor
 
                   height += CalculateUsageDetailsHeight(index, dataObject?.dataName);
                   height += CalculateNameErrorHeight(index);
-                  height += SmallVerticalSpacing;
+                  height += ScriptableEditor.SmallVerticalSpacing;
                   height += CalculatePropertiesHeight(element);
 
                   return Mathf.Max(height, EditorGUIUtility.singleLineHeight * 2 + _blockStyle.padding.vertical + 4);
@@ -588,7 +588,7 @@ namespace ScriptableAsset.Editor
             /// <param dataName="l">The <see cref="ReorderableList"/> instance triggering the removal operation.</param>
             /// <remarks>
             /// This method ensures the proper cleanup of managed reference values and internal usage states when an element is removed.
-            /// After updating the serialized array, it validates all names, updates the editor's target asset state, and applies the changes to the serialized object.
+            /// After updating the serialized array, it validates all names, updates the editor's target assetSo state, and applies the changes to the serialized object.
             /// </remarks>
             private void OnRemoveElement(ReorderableList l)
             {
@@ -612,8 +612,8 @@ namespace ScriptableAsset.Editor
                   // Validate all names after removal to ensure no duplicates remain
                   ValidateAllNames();
 
-                  // Mark the target asset as dirty to ensure changes are saved
-                  EditorUtility.SetDirty(_targetAsset);
+                  // Mark the target assetSo as dirty to ensure changes are saved
+                  EditorUtility.SetDirty(_targetAssetSo);
                   this.serializedObject.ApplyModifiedProperties();
                   this.serializedObject.Update();
             }
@@ -627,7 +627,7 @@ namespace ScriptableAsset.Editor
                         return;
                   }
 
-                  Undo.RecordObject(_targetAsset, "Duplicate Data Object");
+                  Undo.RecordObject(_targetAssetSo, "Duplicate Data Object");
 
                   SerializedProperty sourceElement = _allDataProperty.GetArrayElementAtIndex(index);
 
@@ -691,7 +691,7 @@ namespace ScriptableAsset.Editor
 
                   serializedObject.ApplyModifiedProperties();
                   ValidateAllNames();
-                  EditorUtility.SetDirty(_targetAsset);
+                  EditorUtility.SetDirty(_targetAssetSo);
                   Repaint();
             }
 
@@ -704,7 +704,7 @@ namespace ScriptableAsset.Editor
                         return;
                   }
 
-                  Undo.RecordObject(_targetAsset, "Delete Data Object");
+                  Undo.RecordObject(_targetAssetSo, "Delete Data Object");
 
                   SerializedProperty element = _allDataProperty.GetArrayElementAtIndex(index);
 
@@ -719,7 +719,7 @@ namespace ScriptableAsset.Editor
 
                   serializedObject.ApplyModifiedProperties();
                   ValidateAllNames();
-                  EditorUtility.SetDirty(_targetAsset);
+                  EditorUtility.SetDirty(_targetAssetSo);
                   Repaint();
             }
 
@@ -740,20 +740,20 @@ namespace ScriptableAsset.Editor
 
                   if (GUILayout.Button(new GUIContent(" Clear All Data Objects",
                                               EditorGUIUtility.IconContent("d_TreeEditor.Trash").image,
-                                              "Removes ALL data objects from this asset."),
+                                              "Removes ALL data objects from this assetSo."),
                                   GUILayout.MaxWidth(250)) && EditorUtility.DisplayDialog("Clear All Data Objects",
-                                  $"Are you sure you want to remove all {_allDataProperty.arraySize} data objects from this asset? This action can be undone.",
+                                  $"Are you sure you want to remove all {_allDataProperty.arraySize} data objects from this assetSo? This action can be undone.",
                                   "Clear All",
                                   "Cancel"))
                   {
-                        Undo.RecordObject(_targetAsset, "Clear All Data Objects");
+                        Undo.RecordObject(_targetAssetSo, "Clear All Data Objects");
 
                         _allDataProperty.ClearArray();
                         _foldoutUsageStates.Clear();
                         _detailedDataUsages.Clear();
                         ValidateAllNames();
 
-                        EditorUtility.SetDirty(_targetAsset);
+                        EditorUtility.SetDirty(_targetAssetSo);
                         this.serializedObject.ApplyModifiedProperties();
                         Repaint();
                   }

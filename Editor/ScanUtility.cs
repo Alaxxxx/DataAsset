@@ -8,10 +8,11 @@ using DataAsset.Core;
 using DataAsset.Core.Struct;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
-using UnityEngine.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 
-namespace ScriptableAsset.Editor
+namespace DataAsset.Editor
 {
       public sealed partial class ScriptableEditor
       {
@@ -26,7 +27,7 @@ namespace ScriptableAsset.Editor
             /// The progress of the scan is indicated using an EditorUtility progress bar, and detailed usage data is collected for further inspection.
             /// </remarks>
             /// <exception cref="System.InvalidOperationException">
-            /// Thrown if prerequisites for the scanning process (such as target asset or data properties) are not met.
+            /// Thrown if prerequisites for the scanning process (such as target assetSo or data properties) are not met.
             /// </exception>
             private void StartScanForDataUsages()
             {
@@ -46,14 +47,14 @@ namespace ScriptableAsset.Editor
             }
 
             /// <summary>
-            /// Executes the coroutine responsible for scanning data usage references within the asset.
+            /// Executes the coroutine responsible for scanning data usage references within the assetSo.
             /// This process analyzes prefabs, ScriptableObjects, and open scenes to identify potential references
-            /// to specific data objects within the target asset.
+            /// to specific data objects within the target assetSo.
             /// </summary>
             /// <remarks>
-            /// The method initializes the scan by validating prerequisites such as the presence of a target asset
+            /// The method initializes the scan by validating prerequisites such as the presence of a target assetSo
             /// and relevant data properties.
-            /// It iterates through various asset types, including prefabs and ScriptableObjects,
+            /// It iterates through various assetSo types, including prefabs and ScriptableObjects,
             /// using progress indicators to show the scanning status.
             /// At completion, it aggregates and logs detailed usage information for further analysis.
             /// </remarks>
@@ -61,13 +62,13 @@ namespace ScriptableAsset.Editor
             /// An IEnumerator that allows the coroutine to execute asynchronously without blocking the main thread.
             /// </returns>
             /// <exception cref="System.InvalidOperationException">
-            /// Thrown if the required conditions, such as valid target asset or data properties, are not met before the scan begins.
+            /// Thrown if the required conditions, such as valid target assetSo or data properties, are not met before the scan begins.
             /// </exception>
             private IEnumerator ScanForDataUsagesCoroutine()
             {
-                  if (!_targetAsset || _allDataProperty == null)
+                  if (!_targetAssetSo || _allDataProperty == null)
                   {
-                        Debug.LogError("[ScriptableEditor] Target asset or data property is null. Scan aborted.");
+                        Debug.LogError("[ScriptableEditor] Target assetSo or data property is null. Scan aborted.");
                         _isScanningUsages = false;
                         Repaint();
 
@@ -91,7 +92,7 @@ namespace ScriptableAsset.Editor
 
                   if (!currentDataObjects.Any())
                   {
-                        Debug.Log("[ScriptableEditor] No data objects in the current asset to scan for.");
+                        Debug.Log("[ScriptableEditor] No data objects in the current assetSo to scan for.");
                         _isScanningUsages = false;
                         Repaint();
 
@@ -99,7 +100,7 @@ namespace ScriptableAsset.Editor
                   }
 
                   var scriptsToAnalyzeWithContext = new List<ScriptContext>();
-                  string targetAssetPath = AssetDatabase.GetAssetPath(_targetAsset);
+                  string targetAssetPath = AssetDatabase.GetAssetPath((Object)_targetAssetSo);
 
                   string[] prefabGuids = AssetDatabase.FindAssets("t:Prefab");
 
@@ -126,7 +127,7 @@ namespace ScriptableAsset.Editor
 
                                     while (propIterator.NextVisible(true))
                                     {
-                                          if (propIterator.propertyType != SerializedPropertyType.ObjectReference || propIterator.objectReferenceValue != _targetAsset)
+                                          if (propIterator.propertyType != SerializedPropertyType.ObjectReference || propIterator.objectReferenceValue != _targetAssetSo)
                                           {
                                                 continue;
                                           }
@@ -178,7 +179,7 @@ namespace ScriptableAsset.Editor
 
                               while (propIterator.NextVisible(true))
                               {
-                                    if (propIterator.propertyType == SerializedPropertyType.ObjectReference && propIterator.objectReferenceValue == _targetAsset)
+                                    if (propIterator.propertyType == SerializedPropertyType.ObjectReference && propIterator.objectReferenceValue == _targetAssetSo)
                                     {
                                           MonoScript ms = MonoScript.FromScriptableObject(soInstance);
 
@@ -227,7 +228,7 @@ namespace ScriptableAsset.Editor
                                           while (propIterator.NextVisible(true))
                                           {
                                                 if (propIterator.propertyType != SerializedPropertyType.ObjectReference ||
-                                                    propIterator.objectReferenceValue != _targetAsset)
+                                                    propIterator.objectReferenceValue != _targetAssetSo)
                                                 {
                                                       continue;
                                                 }
@@ -261,7 +262,7 @@ namespace ScriptableAsset.Editor
 
                   if (!scriptsToAnalyzeWithContext.Any())
                   {
-                        Debug.Log($"[ScriptableEditor] No scripts found referencing the asset '{_targetAsset.name}'.");
+                        Debug.Log($"[ScriptableEditor] No scripts found referencing the assetSo '{_targetAssetSo.name}'.");
                         _isScanningUsages = false;
                         Repaint();
 
@@ -347,7 +348,7 @@ namespace ScriptableAsset.Editor
 
                   EditorUtility.ClearProgressBar();
                   _isScanningUsages = false;
-                  long totalUsagesFound = _detailedDataUsages.Sum(static list => list.Value.Count);
+                  long totalUsagesFound = Enumerable.Sum<KeyValuePair<string, List<UsageInfo>>>(_detailedDataUsages, static list => list.Value.Count);
 
                   Debug.Log($"[ScriptableEditor] Script scan complete. Found {totalUsagesFound} data usages across {scriptsToAnalyzeWithContext.Count} script contexts.");
 

@@ -6,7 +6,7 @@ using DataAsset.Core;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace ScriptableAsset.Editor
+namespace DataAsset.Editor
 {
       public sealed partial class ScriptableEditor
       {
@@ -54,7 +54,7 @@ namespace ScriptableAsset.Editor
                         _dataTypes = foundDataObjectSubclasses.OrderBy(static t => t.FullName).ToArray();
 
                         // Create a display dataName for each type, removing the "Reactive" prefix and formatting namespaces
-                        _dataTypeDisplayNames = _dataTypes.Select(static t =>
+                        _dataTypeDisplayNames = Enumerable.Select<Type, string>(_dataTypes, static t =>
                                                           {
                                                                 string originalName = t.Name;
                                                                 string displayName = originalName;
@@ -68,9 +68,9 @@ namespace ScriptableAsset.Editor
 
                                                                 string ns = t.Namespace ?? "";
 
-                                                                if (ns.StartsWith("DataAsset.", StringComparison.Ordinal))
+                                                                if (ns.StartsWith("DataAssetSO.", StringComparison.Ordinal))
                                                                 {
-                                                                      ns = ns["DataAsset.".Length..];
+                                                                      ns = ns["DataAssetSO.".Length..];
                                                                 }
 
                                                                 if (ns == "Base")

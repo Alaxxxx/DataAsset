@@ -6,10 +6,10 @@ using UnityEngine;
 
 namespace DataAsset.Core
 {
-      [CreateAssetMenu(fileName = "NewDataAsset", menuName = "ScriptableObjects/DataAsset", order = 1)]
-      public sealed class DataAsset : ScriptableObject
+      [CreateAssetMenu(fileName = "NewDataAsset", menuName = "ScriptableObjects/DataAssetSo", order = 1)]
+      public sealed class DataAssetSo : ScriptableObject
       {
-            // List of DataObject instances that this DataAsset holds.
+            // List of DataObject instances that this DataAssetSO holds.
             [SerializeReference] private List<DataObject> dataList = new();
 
             // Dictionary to map data names to their corresponding DataObject instances.
@@ -18,7 +18,7 @@ namespace DataAsset.Core
             // Flag to check if the data map has been initialized.
             private bool _isMapInitialized;
 
-            // This event is triggered whenever any data object within this DataAsset changes.
+            // This event is triggered whenever any data object within this DataAssetSO changes.
             public event Action<DataObject> OnAnyDataChanged;
 
 #region Setup
@@ -40,7 +40,7 @@ namespace DataAsset.Core
                         }
                         else
                         {
-                              Debug.LogWarning($"[DataAsset: {this.name}] Duplicate data name '{data.dataName}' found.", this);
+                              Debug.LogWarning($"[DataAssetSO: {this.name}] Duplicate data name '{data.dataName}' found.", this);
                         }
                   }
 
@@ -101,14 +101,14 @@ namespace DataAsset.Core
             {
                   if (data == null || string.IsNullOrEmpty(data.dataName))
                   {
-                        Debug.LogWarning($"[DataAsset: {this.name}] Attempted to add null or unnamed data object.", this);
+                        Debug.LogWarning($"[DataAssetSO: {this.name}] Attempted to add null or unnamed data object.", this);
 
                         return;
                   }
 
                   if (_dataMap.ContainsKey(data.dataName))
                   {
-                        Debug.LogWarning($"[DataAsset: {this.name}] Data with name '{data.dataName}' already exists. Skipping addition.", this);
+                        Debug.LogWarning($"[DataAssetSO: {this.name}] Data with name '{data.dataName}' already exists. Skipping addition.", this);
 
                         return;
                   }

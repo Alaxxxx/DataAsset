@@ -3,7 +3,7 @@ using System.Linq;
 using DataAsset.Core;
 using UnityEditor;
 
-namespace ScriptableAsset.Editor
+namespace DataAsset.Editor
 {
       public sealed partial class ScriptableEditor
       {
@@ -19,8 +19,8 @@ namespace ScriptableAsset.Editor
             /// - Empty or null names are ignored during the validation process.
             /// - The method will return early if `_allDataProperty` is null.
             /// </remarks>
-            /// <seealso cref="ScriptableEditor.ApplySort"/>
-            /// <seealso cref="ScriptableEditor.OnInspectorGUI"/>
+            /// <seealso cref="DataAsset.Editor.ScriptableEditor.ApplySort"/>
+            /// <seealso cref="DataAsset.Editor.ScriptableEditor.OnInspectorGUI"/>
             private void ValidateAllNames()
             {
                   _isNameDuplicate.Clear();

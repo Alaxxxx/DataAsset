@@ -5,18 +5,18 @@ using DataAsset.Core;
 using UnityEditor;
 using UnityEngine;
 
-namespace ScriptableAsset.Editor
+namespace DataAsset.Editor
 {
       public sealed partial class ScriptableEditor
       {
             private void DrawAddDataSectionLayout()
             {
-                  EditorGUILayout.Space(SectionSeparatorSpace);
+                  EditorGUILayout.Space(ScriptableEditor.SectionSeparatorSpace);
                   Rect separatorRect = EditorGUILayout.GetControlRect(false, 1);
                   separatorRect.x -= 2;
                   separatorRect.width += 4;
                   EditorGUI.DrawRect(separatorRect, new Color(0.5f, 0.5f, 0.5f, 0.5f));
-                  EditorGUILayout.Space(AddSectionTopSpace);
+                  EditorGUILayout.Space(ScriptableEditor.AddSectionTopSpace);
 
                   EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                   EditorGUILayout.LabelField("Add New Data", EditorStyles.boldLabel);
@@ -32,7 +32,7 @@ namespace ScriptableAsset.Editor
                         {
                               int selectedTypeIndex = EditorGUILayout.Popup(new GUIContent("Data Type"),
                                           -1,
-                                          _dataTypeDisplayNames.Select(static n => new GUIContent(n)).ToArray());
+                                          Enumerable.Select<string, GUIContent>(_dataTypeDisplayNames, static n => new GUIContent(n)).ToArray());
 
                               if (selectedTypeIndex != -1)
                               {
@@ -198,7 +198,7 @@ namespace ScriptableAsset.Editor
                                           }
 
                                           ResetPendingData();
-                                          EditorUtility.SetDirty(_targetAsset);
+                                          EditorUtility.SetDirty(_targetAssetSo);
                                     }
                                     catch (Exception ex)
                                     {

@@ -17,7 +17,7 @@ namespace DataAsset.Editor
             {
                   Directory.CreateDirectory(GeneratedKeysPath);
 
-                  string[] guids = AssetDatabase.FindAssets($"t:{nameof(Core.DataAsset)}");
+                  string[] guids = AssetDatabase.FindAssets($"t:{nameof(DataAssetSo)}");
 
                   foreach (string guid in guids)
                   {
@@ -30,7 +30,7 @@ namespace DataAsset.Editor
             private static void GenerateKeysForAsset(string guid)
             {
                   string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-                  var dataAsset = AssetDatabase.LoadAssetAtPath<DataAsset.Core.DataAsset>(assetPath);
+                  var dataAsset = AssetDatabase.LoadAssetAtPath<DataAssetSo>(assetPath);
 
                   if (dataAsset == null)
                   {

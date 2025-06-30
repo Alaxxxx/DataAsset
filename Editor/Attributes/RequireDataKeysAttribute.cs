@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace DataAsset.Core.Attributes
+namespace DataAsset.Editor.Attributes
 {
       [AttributeUsage(AttributeTargets.Field)]
       public sealed class RequireDataKeysAttribute : PropertyAttribute

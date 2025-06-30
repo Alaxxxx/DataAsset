@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DataAsset.Core.Attributes;
+using DataAsset.Editor.Attributes;
 using UnityEditor;
 using UnityEngine;
 
-namespace ScriptableAsset.Editor
+namespace DataAsset.Editor
 {
       [CustomPropertyDrawer(typeof(RequireDataKeysAttribute))]
       public class AttributeRequiredDrawer : PropertyDrawer
@@ -22,13 +22,13 @@ namespace ScriptableAsset.Editor
                         return;
                   }
 
-                  var soAsset = property.objectReferenceValue as DataAsset.Core.DataAsset;
+                  var soAsset = property.objectReferenceValue as Core.DataAssetSo;
                   string message = null;
                   var messageType = MessageType.None;
 
                   if (soAsset)
                   {
-                        var assetAttribute = (RequireDataKeysAttribute)attribute;
+                        var assetAttribute = (RequireDataKeysAttribute)this.attribute;
                         List<string> missingKeys = GetMissingKeys(soAsset, assetAttribute.RequiredKeys);
 
                         if (missingKeys.Any())
@@ -39,7 +39,7 @@ namespace ScriptableAsset.Editor
                   }
                   else
                   {
-                        message = $"Assigned object is not a '{nameof(DataAsset.Core.DataAsset)}'. Expected type: {typeof(DataAsset.Core.DataAsset).FullName}";
+                        message = $"Assigned object is not a '{nameof(Core.DataAssetSo)}'. Expected type: {typeof(Core.DataAssetSo).FullName}";
                         messageType = MessageType.Error;
                   }
 
@@ -59,7 +59,7 @@ namespace ScriptableAsset.Editor
                   {
                         string messageContentForHeight = null;
 
-                        if (property.objectReferenceValue is DataAsset.Core.DataAsset soAsset)
+                        if (property.objectReferenceValue is Core.DataAssetSo soAsset)
                         {
                               var keysAttribute = (RequireDataKeysAttribute)this.attribute;
                               List<string> missingKeys = GetMissingKeys(soAsset, keysAttribute.RequiredKeys);
@@ -71,7 +71,7 @@ namespace ScriptableAsset.Editor
                         }
                         else
                         {
-                              messageContentForHeight = $"Assigned object is not a '{nameof(DataAsset.Core.DataAsset)}'.";
+                              messageContentForHeight = $"Assigned object is not a '{nameof(Core.DataAssetSo)}'.";
                         }
 
                         if (messageContentForHeight != null)
@@ -83,11 +83,11 @@ namespace ScriptableAsset.Editor
                   return height;
             }
 
-            private static List<string> GetMissingKeys(DataAsset.Core.DataAsset asset, string[] requiredKeys)
+            private static List<string> GetMissingKeys(Core.DataAssetSo assetSo, string[] requiredKeys)
             {
                   var missingKeys = new List<string>();
 
-                  if (!asset || requiredKeys == null)
+                  if (!assetSo || requiredKeys == null)
                   {
                         return missingKeys;
                   }
@@ -99,7 +99,7 @@ namespace ScriptableAsset.Editor
                               continue;
                         }
 
-                        if (asset.GetData(key) == null)
+                        if (assetSo.GetData(key) == null)
                         {
                               missingKeys.Add($"'{key}'");
                         }

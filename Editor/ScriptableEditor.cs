@@ -6,9 +6,9 @@ using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace ScriptableAsset.Editor
+namespace DataAsset.Editor
 {
-      [CustomEditor(typeof(DataAsset.Core.DataAsset))]
+      [CustomEditor(typeof(DataAsset.Core.DataAssetSo))]
       public sealed partial class ScriptableEditor : UnityEditor.Editor
       {
             // Constants for layout and styles
@@ -34,8 +34,8 @@ namespace ScriptableAsset.Editor
             // Constants for spacing
             private const float SmallVerticalSpacing = 2f;
 
-            // The target asset being edited
-            private DataAsset.Core.DataAsset _targetAsset;
+            // The target assetSo being edited
+            private DataAsset.Core.DataAssetSo _targetAssetSo;
 
             // Serialized property for the list of data objects
             private SerializedProperty _allDataProperty;
@@ -77,35 +77,35 @@ namespace ScriptableAsset.Editor
 
             /// <summary>
             /// Unity calls this method automatically when the custom editor is enabled in the Inspector.
-            /// It initializes important serialized properties, validates asset data, and sets up custom
+            /// It initializes important serialized properties, validates assetSo data, and sets up custom
             /// editor functionality like data reflection, styles, and UI components.
             /// </summary>
             /// <remarks>
             /// - The method ensures the target ScriptableObject is properly assigned and logs an error if null.
-            /// - Finds and validates the serialized property for asset data to ensure it is accessible for modification.
+            /// - Finds and validates the serialized property for assetSo data to ensure it is accessible for modification.
             /// - Calls helper methods to initialize type reflection systems, define custom colors, configure reorderable lists,
             /// and reset pending data for the editor.
             /// - If any property is incorrectly set or missing, appropriate error messages are logged in the console.
             /// </remarks>
             private void OnEnable()
             {
-                  // Initialize the target asset and serialized properties
-                  _targetAsset = (DataAsset.Core.DataAsset)target;
+                  // Initialize the target assetSo and serialized properties
+                  _targetAssetSo = (DataAsset.Core.DataAssetSo)this.target;
 
-                  if (!_targetAsset)
+                  if (!_targetAssetSo)
                   {
-                        Debug.LogError("[ScriptableEditor] Target asset is null. Ensure the scriptable object is assigned correctly.");
+                        Debug.LogError("[ScriptableEditor] Target assetSo is null. Ensure the scriptable object is assigned correctly.");
 
                         return;
                   }
 
-                  // Find the serialized property for the asset data
-                  _allDataProperty = serializedObject.FindProperty("dataList");
+                  // Find the serialized property for the assetSo data
+                  _allDataProperty = this.serializedObject.FindProperty("dataList");
 
                   // Check if the property is found and is an array/list
                   if (_allDataProperty is not { isArray: true })
                   {
-                        Debug.LogError($"[ScriptableEditor] SerializedProperty 'dataList' not found or is not a list/array in '{_targetAsset.name}'.");
+                        Debug.LogError($"[ScriptableEditor] SerializedProperty 'dataList' not found or is not a list/array in '{_targetAssetSo.name}'.");
                         _allDataProperty = null;
 
                         return;
@@ -124,19 +124,19 @@ namespace ScriptableAsset.Editor
             /// serialized properties for display and modification within the Editor.
             /// </summary>
             /// <remarks>
-            /// - Updates the serialized object to ensure all data is synchronized between the asset and the editor.
+            /// - Updates the serialized object to ensure all data is synchronized between the assetSo and the editor.
             /// - Displays errors or warnings if required serialized properties or UI elements are unavailable.
             /// - Incorporates a reorderable list to enhance the user experience when managing large datasets.
             /// - Includes mechanisms to add new data entries via a custom "Add Data" section.
             /// - Applies modifications to serialized properties, triggering data validation when needed to ensure
-            /// consistent and error-free asset state.
+            /// consistent and error-free assetSo state.
             /// - When a layout event occurs, invokes validation of all names to ensure unique and error-free identifiers.
             /// - Provides fallback behavior to render default inspector elements when critical data is unavailable.
             /// </remarks>
             public override void OnInspectorGUI()
             {
                   InitializeEditorStyles();
-                  serializedObject.Update();
+                  this.serializedObject.Update();
 
                   if (_allDataProperty == null)
                   {
@@ -171,7 +171,7 @@ namespace ScriptableAsset.Editor
                         DrawAddDataSectionLayout();
                   }
 
-                  if (serializedObject.ApplyModifiedProperties())
+                  if (this.serializedObject.ApplyModifiedProperties())
                   {
                         ValidateAllNames();
                   }
