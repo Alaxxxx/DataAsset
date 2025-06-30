@@ -10,9 +10,9 @@ namespace DataAsset.Editor
 {
       public static class DataAssetKeyGenerator
       {
-            private const string GeneratedKeysPath = "Assets/DataAsset/Generated/DataKeys";
+            private const string GeneratedKeysPath = "Assets/DataAsset/Generated";
 
-            [MenuItem("Assets/DataAsset/Generate All Keys")]
+            [MenuItem("Tools/DataAsset/Generate All Keys")]
             public static void GenerateAllKeys()
             {
                   Directory.CreateDirectory(GeneratedKeysPath);
