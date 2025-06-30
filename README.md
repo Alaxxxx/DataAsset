@@ -228,6 +228,7 @@ Scan results are cached in the Editor. It is recommended to re-run the scan if y
 ## Requirements
 
 -   Unity 2021.3 LTS or newer.
+-   EditorCoroutines 1.0.0.
 
 ## License
 
