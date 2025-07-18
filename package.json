@@ -1,6 +1,6 @@
 ﻿{
     "name": "com.opalstudio.dataasset",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "displayName": "DataAsset",
     "description": "A framework for implementing a data-oriented design in Unity, using ScriptableObjects as a robust alternative to the Singleton pattern for managing shared data.",
     "unity": "2021.3",
