@@ -1,6 +1,6 @@
 ﻿{
     "name": "com.opalstudio.dataasset",
-    "version": "1.0.2",
+    "version": "1.0.4",
     "displayName": "DataAsset",
     "description": "A framework for implementing a data-oriented design in Unity, using ScriptableObjects as a robust alternative to the Singleton pattern for managing shared data.",
     "unity": "2021.3",
@@ -8,7 +8,7 @@
     "licensesUrl": "https://github.com/Alaxxxx/DataAsset/blob/main/LICENSE",
     "license": "MIT",
     "dependencies": {
-        "com.unity.editorcoroutines": "1.0.3"
+        "com.unity.editorcoroutines": "1.0.0"
     },
     "author": {
         "name": "Alaxxxx",
